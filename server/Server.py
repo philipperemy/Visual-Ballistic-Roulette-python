@@ -6,7 +6,7 @@ from flask import Flask, Response
 from flask_restful import Resource, Api, reqparse
 
 from SessionManager import *
-from computations.predictor import PredictorInterface
+from computations.predictor.physics.constantdeceleration.PredictorPhysicsConstantDeceleration import *
 from computations.utils.Helper import *
 from database.DatabaseAccessor import *
 
@@ -34,7 +34,7 @@ sm = SessionManager()
 da = DatabaseAccessor()
 sm.init(da)
 
-pr = PredictorInterface.PredictorPhysicsConstantDeceleration()
+pr = PredictorPhysicsConstantDeceleration()
 
 
 def predict_most_probable_number(session_id):
@@ -64,7 +64,7 @@ def enable_ajax(ret_value):
 
 
 class RequestRoulette(Resource):
-    @staticmethod  # remove it if it does not work
+    @staticmethod
     def get():
         try:
             parser = reqparse.RequestParser()
@@ -93,7 +93,7 @@ class RequestRoulette(Resource):
 
 
 class ResponseRoulette(Resource):
-    @staticmethod  # remove it if it does not work
+    @staticmethod
     def get():
         ret_value = ''
         try:
@@ -124,8 +124,15 @@ class ResponseRoulette(Resource):
         return resp
 
 
+class HelloWorldRoulette(Resource):
+    @staticmethod
+    def get():
+        return 'Hello Roulette world.'
+
+
 api.add_resource(RequestRoulette, '/Request', methods=['GET'])
 api.add_resource(ResponseRoulette, '/Response', methods=['GET'])
+api.add_resource(HelloWorldRoulette, '/', methods=['GET'])
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -18,7 +18,12 @@ class DatabaseAccessor(object):
         return DatabaseAccessor.__instance__
 
     def __init__(self):
-        self.connect = sqlite3.connect(Constants.DATABASE_NAME)
+        self.connect = sqlite3.connect(Constants.DATABASE_NAME, check_same_thread=False)
+        self.exec_query('CREATE TABLE IF NOT EXISTS `session` (`ID` INTEGER PRIMARY KEY AUTOINCREMENT)')
+        self.exec_query('CREATE TABLE IF NOT EXISTS `ball_lap_times` (`ID` INTEGER PRIMARY KEY AUTOINCREMENT, `SESSION_ID` int(10) NOT NULL, `TIME` varchar(255) NOT NULL)')
+        self.exec_query('CREATE TABLE IF NOT EXISTS `clockwise` (`ID` INTEGER PRIMARY KEY AUTOINCREMENT, `CLOCKWISE` int(11) NOT NULL, `SESSION_ID` int(11) NOT NULL)')
+        self.exec_query('CREATE TABLE IF NOT EXISTS `outcomes` (`ID` INTEGER PRIMARY KEY AUTOINCREMENT, `SESSION_ID` int(10) NOT NULL, `NUMBER` varchar(255) NOT NULL, `OBSTACLES` int(10) NOT NULL)')
+        self.exec_query('CREATE TABLE IF NOT EXISTS `wheel_lap_times` (`ID` INTEGER PRIMARY KEY AUTOINCREMENT, `SESSION_ID` int(10) NOT NULL, `TIME` varchar(255) NOT NULL)')
 
     def insert_ball_lap_times(self, session_id, lap_time):
         print("insert_ball_lap_times, session_id = {}, lap time = {}".format(session_id, lap_time))

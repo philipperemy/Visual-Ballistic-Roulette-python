@@ -31,7 +31,7 @@ class SessionManager(object):
         if query_time - self.timestamp_ofLast_query > Constants.THRESHOLD_BEFORE_NEW_SESSION_IN_MS:
             #  Start new session
             new_session_id = self.database.increment_and_get_session_id()
-            print("Starting new session with id = " + new_session_id)
+            print("Starting new session with id = {}".format(new_session_id))
         else:
             new_session_id = self.database.get_last_session_id()
         # update time of last query

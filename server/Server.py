@@ -9,6 +9,7 @@ from SessionManager import *
 from computations.predictor.physics.constantdeceleration.PredictorPhysicsConstantDeceleration import *
 from computations.utils.Helper import *
 from database.DatabaseAccessor import *
+from Logging import log
 
 
 def current_time_millis():
@@ -74,10 +75,10 @@ class RequestRoulette(Resource):
             timestamp = args[Parameters.TIME]
 
             if timestamp is None:
-                raise Exception('parameter time missing')
+                raise Exception('Parameter time ({}) missing.'.format(Parameters.TIME))
             object_type = args[Parameters.TYPE]
             if object_type is None:
-                raise Exception('parameter type missing')
+                raise Exception('Parameter type ({}) missing.'.format(Parameters.TYPE))
 
             session_id = sm.call_manager(query_time=current_time_millis())
 
@@ -88,8 +89,14 @@ class RequestRoulette(Resource):
             else:
                 raise Exception('parameter type is invalid')
 
+            return {'status': 'success',
+                    'ts': str(timestamp),
+                    'type': str(object_type)}
+
         except Exception as e:
-            return {'error': str(e)}
+            log(e)
+            return {'status': 'failure',
+                    'error': str(e)}
 
 
 class ResponseRoulette(Resource):
@@ -103,22 +110,23 @@ class ResponseRoulette(Resource):
             args = parser.parse_args()
             session_id = args[Parameters.SESSION_ID]
             if session_id is None:
-                da.get_last_session_id()
-                print('No session specified. Selecting the last known session id = ' + session_id)
+                session_id = da.get_last_session_id()
+                log('No session specified. Selecting the last known session id = {}.'.format(session_id))
             if session_id is None or session_id == '':
-                print('Problem occurred. SessionId should not be empty.')
+                log('Problem occurred. Session id should not be empty.')
                 raise Exception()
             outcome = args['outcome']
             if outcome is not None and outcome != '':
                 da.insert_outcome(session_id, outcome)
-                print('New outcome inserted. Session id = ' + session_id + ', outcome = ' + outcome)
+                log('New outcome inserted. Session id = {}, outcome = {}'.format(session_id, outcome))
 
             # Predict outcome workflow.
             predicted_number = predict_most_probable_number(session_id)
             ret_value = {'predicted_number': predicted_number}
-            print('Prediction=' + str(predicted_number) + ', sessionId=' + session_id)
+            log('Predicted number = {}, session id = {}'.format(predicted_number, session_id))
         except Exception as e:
-            print(str(e))
+            log(e)
+            return {'error': str(e)}
 
         resp = enable_ajax(ret_value)
         return resp

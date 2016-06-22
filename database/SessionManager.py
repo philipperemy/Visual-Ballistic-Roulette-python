@@ -2,7 +2,7 @@
 """ generated source for module Session_manager """
 from __future__ import print_function
 
-from Constants import *
+from computations.Constants import *
 
 
 #  * A session corresponds to a game played or measured

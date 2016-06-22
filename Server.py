@@ -1,15 +1,26 @@
 from __future__ import print_function
 
+import sys
 import time
 
 from flask import Flask, Response
 from flask_restful import Resource, Api, reqparse
 
-from SessionManager import *
+
+def add_all_folders_to_python_path():
+    sys.path.append("./database")
+    sys.path.append("./computations")
+    sys.path.append("./computations/utils")
+    sys.path.append("./utils")
+
+
+add_all_folders_to_python_path()
+
+from database.DatabaseAccessor import *
+from database.SessionManager import *
 from computations.predictor.physics.constantdeceleration.PredictorPhysicsConstantDeceleration import *
 from computations.utils.Helper import *
-from database.DatabaseAccessor import *
-from Logging import log
+from utils.Logging import *
 
 
 def current_time_millis():

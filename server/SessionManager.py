@@ -14,7 +14,7 @@ class SessionManager(object):
     def init(self, da):
         self.database = da
 
-    @classmethod
+    @staticmethod
     def get_instance(cls):
         if cls.instance_ is None:
             cls.instance_ = SessionManager()

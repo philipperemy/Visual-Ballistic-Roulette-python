@@ -7,8 +7,6 @@ from HelperConstantDeceleration import *
 
 
 class PredictorPhysicsConstantDeceleration(PredictorPhysics):
-    def __init__(self):
-        pass
 
     def predict(self, ball_cumsum_times, wheel_cumsum_times):
         cutoff_speed = Constants.CUTOFF_SPEED
@@ -33,9 +31,3 @@ class PredictorPhysicsConstantDeceleration(PredictorPhysics):
                                                    last_time_ball_passes_in_front_of_ref,
                                                    wheel_diff_times,
                                                    phase_at_cut_off, time_at_cutoff_ball)
-
-    def init(self, da):
-        pass
-
-    def clear(self):
-        pass

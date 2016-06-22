@@ -6,7 +6,7 @@ from Phase import *
 
 class PredictorPhysics(Predictor):
     #  Common code shared by all the physics predictors.
-    @classmethod
+
     def predict(cls, wheel_cumsum_times, diff_origin, last_time_ball_passes_in_front_of_ref, wheel_diff_times,
                 phase_at_cut_off, time_at_cutoff_ball):
         if time_at_cutoff_ball < last_time_ball_passes_in_front_of_ref + Constants.TIME_LEFT_FOR_PLACING_BETS_SECONDS:

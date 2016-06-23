@@ -1,4 +1,6 @@
+# sudo apt-get install libblas-dev liblapack-dev libatlas-base-dev gfortran
 numpy
+scipy
 sklearn
 flask
 flask-restful

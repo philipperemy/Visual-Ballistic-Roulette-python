@@ -89,7 +89,7 @@ class TestWheel(unittest.TestCase):
         self.assertEqual(Wheel.distance_between_numbers(18, 34), Wheel.distance_between_numbers(34, 18))
 
     def test_distance_two_random_numbers(self):
-        N = 1000000
+        N = 100000
         r = np.random.randint(len(Wheel.NUMBERS), size=(N, 2))
         dist = 0.0
         for i in range(N):

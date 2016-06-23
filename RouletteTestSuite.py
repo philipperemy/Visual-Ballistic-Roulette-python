@@ -3,18 +3,18 @@ import unittest
 
 
 def add_all_folders_to_python_path():
-    sys.path.append("../database")
-    sys.path.append("../computations")
-    sys.path.append("../computations/predictor")
-    sys.path.append("../computations/utils")
-    sys.path.append("../utils")
+    sys.path.append("./database")
+    sys.path.append("./computations")
+    sys.path.append("./computations/predictor")
+    sys.path.append("./computations/utils")
+    sys.path.append("./utils")
 
 
 add_all_folders_to_python_path()
 
-from OutcomeStatisticsTest import OutcomeStatisticsTest
-from RegressionTest import RegressionTest
-from TestWheel import TestWheel
+from test.OutcomeStatisticsTest import OutcomeStatisticsTest
+from test.RegressionTest import RegressionTest
+from test.TestWheel import TestWheel
 
 from test.TestHelper import TestHelper
 

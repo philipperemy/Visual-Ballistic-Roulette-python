@@ -22,14 +22,9 @@ class Wheel(object):
     # 	 * @return valid index
     @staticmethod
     def get_index(index):
-        count_wheel_numbers = len(Wheel.NUMBERS)
-        while index < 0:
-            index += count_wheel_numbers
-        while index >= count_wheel_numbers:
-            index -= count_wheel_numbers
-        return index
+        return index % len(Wheel.NUMBERS)
 
-    # 
+    #
     # 	 * Calculate the region around a specific number. Example is:
     # 	 * region(reference_number=32, half_size = 2) = [26,0,32,15,19]
     # 	 
@@ -38,7 +33,10 @@ class Wheel(object):
         idx_number = Wheel.find_index_of_number(reference_number)
         first_idx_number = Wheel.get_index(idx_number - half_size)
         num_of_elements = half_size * 2 + 1
-        nearby_numbers = Wheel.NUMBERS[first_idx_number:first_idx_number + num_of_elements]
+        nearby_numbers = []
+        for j in range(num_of_elements):
+            nearby_numbers.append(Wheel.NUMBERS[Wheel.get_index(first_idx_number)])
+            first_idx_number += 1
         return nearby_numbers
 
     # 
@@ -67,22 +65,17 @@ class Wheel(object):
             raise CriticalException("Unknown type.")
         return Wheel.NUMBERS[Wheel.get_index(new_idx)]
 
-    # 
-    # 	 * Example is: Give me the index of the number 32. Answer is 1.
-    # 	 
+    # Example is: Give me the index of the number 32. Answer is 1.
     @staticmethod
     def find_index_of_number(number):
         return Wheel.NUMBERS.index(number)
 
-    # 
-    # 	 * Calculates the translation between (phase1, outcome1) and applies this
-    # 	 * translation to phase2. Example is: phase1 = 0, outcome1 = 32. phase2 =
-    # 	 * 19. translation(phase1, outcome1) = you add 1 forward. You take the
-    # 	 * number 19 and you add this translation. The result is 4.
-    # 	 
+    # Calculates the translation between (phase1, outcome1) and applies this
+    # translation to phase2. Example is: phase1 = 0, outcome1 = 32. phase2 =
+    # 19. translation(phase1, outcome1) = you add 1 forward. You take the
+    # number 19 and you add this translation. The result is 4.
     @staticmethod
     def predict_outcome_with_shift(phase1, outcome1, phase2):
-        """ generated source for method predict_outcomeWith_shift """
         idx_p1 = Wheel.find_index_of_number(phase1)
         idx_o1 = Wheel.find_index_of_number(outcome1)
         diff_idx_between_phase_and_outcome1 = Wheel.get_index(idx_o1 - idx_p1)
@@ -90,15 +83,11 @@ class Wheel(object):
         id_o2 = Wheel.get_index(id_p2 + diff_idx_between_phase_and_outcome1)
         return Wheel.NUMBERS[id_o2]
 
-    # 
-    # 	 * Here max distance is 37/2. Opposite of the wheel. Calculate the shortest
-    # 	 * distance between two numbers. Example: distance(0,32) = 1.
-    # 	 
+    # Here max distance is 37/2. Opposite of the wheel. Calculate the shortest
+    # distance between two numbers. Example: distance(0,32) = 1.
     @staticmethod
     def distance_between_numbers(number1, number2):
-        """ generated source for method distance_betweenNumbers """
         idx1 = Wheel.find_index_of_number(number1)
         idx2 = Wheel.find_index_of_number(number2)
         diff = abs(idx1 - idx2)
-        diff_to_max_len = len(Wheel.NUMBERS) - diff
-        return diff if diff < diff_to_max_len else diff_to_max_len
+        return min(diff, len(Wheel.NUMBERS) - diff)

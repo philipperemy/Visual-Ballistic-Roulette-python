@@ -34,5 +34,5 @@ class OutcomeStatistics(object):
             raise (Exception('Most probable number should not be null'))
 
         return {'mean_number': mean_number,
-                'std_deviation': np.std(variance),
+                'std_deviation': np.sqrt(variance),
                 'most_common': most_probable_number}

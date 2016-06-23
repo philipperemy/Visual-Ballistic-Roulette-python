@@ -17,16 +17,16 @@ class Helper(object):
     @staticmethod
     def get_last_time_wheel_is_in_front_of_ref(wheel_lap_times, ball_lap_time_in_front_of_ref):
         # index starts at 0.
-        idx = np.sum(np.array(wheel_lap_times < ball_lap_time_in_front_of_ref, dtype=int)) - 1
+        idx = np.sum(np.array(np.array(wheel_lap_times) < ball_lap_time_in_front_of_ref, dtype=int)) - 1
         return wheel_lap_times[idx]
 
     @staticmethod
     def compute_diff(lap_times):
-        return np.diff(lap_times)
+        return np.diff(np.array(lap_times))
 
     @staticmethod
     def normalize(cumsum_times, origin):
-        return cumsum_times - origin
+        return np.array(cumsum_times) - origin
 
     @staticmethod
     def estimate_distance_constant_speed(t1, t2, speed):

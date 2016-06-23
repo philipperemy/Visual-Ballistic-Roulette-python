@@ -25,7 +25,6 @@ class HelperConstantDeceleration(object):
 
     @staticmethod
     def estimate_revolution_count_left(constant_deceleration_model, current_revolution, cutoff_speed):
-        """ generated source for method estimate_revolutionCount_left """
 
         slope = constant_deceleration_model.coef_[0, 0]
         intercept = constant_deceleration_model.intercept_[0]

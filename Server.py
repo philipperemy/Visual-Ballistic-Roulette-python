@@ -1,9 +1,9 @@
-from __future__ import print_function
+#!/usr/bin/env python
 
 import sys
 import time
 
-from flask import Flask, Response
+from flask import Flask
 from flask_restful import Resource, Api, reqparse
 
 
@@ -50,28 +50,30 @@ pr = PredictorPhysicsConstantDeceleration()
 
 
 def predict_most_probable_number(session_id):
-    wheel_cumsum_times = da.select_wheel_lap_times(session_id)
     ball_cumsum_times = da.select_ball_lap_times(session_id)
+    wheel_cumsum_times = da.select_wheel_lap_times(session_id)
 
-    number_of_recorded_wheel_times = len(wheel_cumsum_times)
-    if number_of_recorded_wheel_times < Constants.MIN_NUMBER_OF_WHEEL_TIMES_BEFORE_PREDICTION \
-            or ball_cumsum_times.size() < Constants.MIN_NUMBER_OF_BALL_TIMES_BEFORE_PREDICTION:
+    if len(wheel_cumsum_times) < Constants.MIN_NUMBER_OF_WHEEL_TIMES_BEFORE_PREDICTION:
         raise SessionNotReadyException()
 
-    wheel_cumsum_times_seconds = Helper.convert_to_seconds(wheel_cumsum_times)
-    ball_cumsum_times_seconds = Helper.convert_to_seconds(ball_cumsum_times)
+    if len(ball_cumsum_times) < Constants.MIN_NUMBER_OF_BALL_TIMES_BEFORE_PREDICTION:
+        raise SessionNotReadyException()
 
-    most_probable_number = pr.machineLearning().predict(ball_cumsum_times_seconds, wheel_cumsum_times_seconds)
+    # in seconds.
+    ball_cumsum_times = np.array(Helper.convert_to_seconds(ball_cumsum_times))
+    wheel_cumsum_times = np.array(Helper.convert_to_seconds(wheel_cumsum_times))
+
+    most_probable_number = pr.predict(ball_cumsum_times, wheel_cumsum_times)
     return most_probable_number
 
 
-def enable_ajax(ret_value):
-    resp = Response(ret_value)
+@app.after_request
+def after_request(resp):
+    """http://stackoverflow.com/a/28923164"""
     resp.headers['Access-Control-Allow-Origin'] = '*'
     resp.headers['Access-Control-Allow-Methods'] = 'GET'
     resp.headers['Access-Control-Allow-Credentials'] = 'true'
     resp.headers['Access-Control-Allow-Headers'] = 'Content-Type, Accept'
-    resp.headers['Content-Type'] = 'application/json'
     return resp
 
 
@@ -102,7 +104,8 @@ class RequestRoulette(Resource):
 
             return {'status': 'success',
                     'ts': str(timestamp),
-                    'type': str(object_type)}
+                    'type': str(object_type),
+                    'session_id': str(session_id)}
 
         except Exception as e:
             log(e)
@@ -113,7 +116,6 @@ class RequestRoulette(Resource):
 class ResponseRoulette(Resource):
     @staticmethod
     def get():
-        ret_value = ''
         try:
             parser = reqparse.RequestParser()
             parser.add_argument(Parameters.SESSION_ID, type=str)
@@ -133,14 +135,25 @@ class ResponseRoulette(Resource):
 
             # Predict outcome workflow.
             predicted_number = predict_most_probable_number(session_id)
-            ret_value = {'predicted_number': predicted_number}
+            output = {'predicted_number': predicted_number,
+                      'status': 'success'}
             log('Predicted number = {}, session id = {}'.format(predicted_number, session_id))
+        except PositiveValueExpectedException:
+            msg = 'Positive value expected.'
+            log(msg)
+            output = {'error': msg,
+                      'status': 'failure'}
+        except SessionNotReadyException:
+            msg = 'Session not ready yet.'
+            log(msg)
+            output = {'error': msg,
+                      'status': 'failure'}
         except Exception as e:
             log(e)
-            return {'error': str(e)}
+            output = {'error': str(e),
+                      'status': 'failure'}
 
-        resp = enable_ajax(ret_value)
-        return resp
+        return output
 
 
 class HelloWorldRoulette(Resource):

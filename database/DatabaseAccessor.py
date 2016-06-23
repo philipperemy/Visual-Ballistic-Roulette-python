@@ -1,8 +1,7 @@
-from __future__ import print_function
-
 import sqlite3
 
 from Constants import *
+from utils.Logging import *
 
 
 class DatabaseAccessor(object):
@@ -30,14 +29,13 @@ class DatabaseAccessor(object):
             'CREATE TABLE IF NOT EXISTS `wheel_lap_times` (`ID` INTEGER PRIMARY KEY AUTOINCREMENT, `SESSION_ID` int(10) NOT NULL, `TIME` varchar(255) NOT NULL)')
 
     def insert_ball_lap_times(self, session_id, lap_time):
-        print("insert_ball_lap_times, session_id = {}, lap time = {}".format(session_id, lap_time))
         self.insert(self.BALL_LAP_TIMES_TABLE_NAME, session_id, lap_time)
 
     def insert_wheel_lap_times(self, session_id, lap_time):
-        print("insert_wheel_lap_times, session_id = {}, lap time = {}".format(session_id, lap_time))
         self.insert(self.WHEEL_LAP_TIMES_TABLE_NAME, session_id, lap_time)
 
     def insert(self, table_name, session_id, lap_time):
+        log("table_name = {}, session_id = {}, lap_time = {}".format(table_name, session_id, lap_time))
         query = "INSERT INTO `" + table_name + "` (`ID`, `SESSION_ID`, `TIME`) VALUES (NULL, '" + \
                 str(session_id) + "', '" + str(lap_time) + "');"
         self.exec_query(query)
@@ -72,7 +70,7 @@ class DatabaseAccessor(object):
         sql_query = "SELECT TIME FROM `" + table_name + "` WHERE SESSION_ID = " + str(session_id) + ";"
         result = []
         for row in self.connect.execute(sql_query):
-            result.append(row['TIME'])
+            result.append(float(row[0]))
         return result
 
     def close(self):

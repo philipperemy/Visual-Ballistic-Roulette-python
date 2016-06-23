@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 from Helper import *
 
 
@@ -20,7 +18,7 @@ class Phase(object):
                                                  way):
         diff_time = np.abs(time_of_ball_in_front_of_mark - time_of_wheel_in_front_of_mark)
         wheel_revolution_time = Helper.get_time_for_one_wheel_loop(last_wheel_speed)
-        numbers_count = Wheel.NUMBERS.length
+        numbers_count = len(Wheel.NUMBERS)
         idx_phase = int((diff_time / wheel_revolution_time * numbers_count))
         idx_zero = Wheel.find_index_of_number(0)  # Should be always 0
         if time_of_ball_in_front_of_mark > time_of_wheel_in_front_of_mark:

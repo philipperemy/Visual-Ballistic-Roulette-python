@@ -1,7 +1,3 @@
-#!/usr/bin/env python
-""" generated source for module Distance_error """
-from __future__ import print_function
-
 from Wheel import Wheel
 
 

@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-""" generated source for module Constants """
-from __future__ import print_function
 
 from Wheel import Wheel
 

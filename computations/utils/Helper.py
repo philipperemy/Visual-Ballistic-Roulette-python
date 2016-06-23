@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import numpy as np
 from sklearn import linear_model
 
@@ -10,23 +8,11 @@ from Exceptions import *
 class Helper(object):
     @staticmethod
     def convert_to_seconds(milliseconds):
-        return [0.001 * x for x in milliseconds]
-
-    @staticmethod
-    def peek(list_):
-        return list_[-1]
-
-    @staticmethod
-    def head(list_):
-        return list_[0]
+        return [1e-3 * x for x in milliseconds]
 
     @staticmethod
     def print_val_or_infinity_symbol(value):
         return "+oo" if value > 1e9 else str(value)
-
-    @staticmethod
-    def print_digit(number):
-        print('%04d' % number)
 
     @staticmethod
     def get_last_time_wheel_is_in_front_of_ref(wheel_lap_times, ball_lap_time_in_front_of_ref):
@@ -84,6 +70,6 @@ class Helper(object):
 
     @staticmethod
     def perform_regression(x_values, y_values):
-        clf = linear_model.LinearRegression(fit_intercept=True)
-        clf.fit(x_values, y_values)
+        clf = linear_model.LinearRegression()
+        clf.fit(x_values.reshape(-1, 1), y_values.reshape(-1, 1))
         return clf

@@ -46,8 +46,6 @@ sm = SessionManager()
 da = DatabaseAccessor()
 sm.init(da)
 
-pr = PredictorPhysicsConstantDeceleration()
-
 
 def predict_most_probable_number(session_id):
     ball_cumsum_times = da.select_ball_lap_times(session_id)
@@ -63,7 +61,7 @@ def predict_most_probable_number(session_id):
     ball_cumsum_times = np.array(Helper.convert_to_seconds(ball_cumsum_times))
     wheel_cumsum_times = np.array(Helper.convert_to_seconds(wheel_cumsum_times))
 
-    most_probable_number = pr.predict(ball_cumsum_times, wheel_cumsum_times)
+    most_probable_number = PredictorPhysicsConstantDeceleration.predict(ball_cumsum_times, wheel_cumsum_times)
     return most_probable_number
 
 

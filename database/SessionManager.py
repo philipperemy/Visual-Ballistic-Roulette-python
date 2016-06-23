@@ -2,7 +2,7 @@ from computations.Constants import *
 from utils.Logging import *
 
 
-#  * A session corresponds to a game played or measured
+#  A session corresponds to a game played or measured
 class SessionManager(object):
     instance_ = None
     database = None
@@ -10,12 +10,6 @@ class SessionManager(object):
 
     def init(self, da):
         self.database = da
-
-    @staticmethod
-    def get_instance(cls):
-        if cls.instance_ is None:
-            cls.instance_ = SessionManager()
-        return cls.instance_
 
     def __init__(self):
         pass

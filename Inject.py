@@ -1,9 +1,6 @@
 import sys
 import time
 
-from flask import Flask, Response
-from flask_restful import Resource, Api, reqparse
-
 
 def add_all_folders_to_python_path():
     sys.path.append("./database")
@@ -16,8 +13,10 @@ add_all_folders_to_python_path()
 
 from database.DatabaseAccessor import *
 
+
 def current_time_millis():
     return int(round(time.time() * 1000))
+
 
 da = DatabaseAccessor()
 

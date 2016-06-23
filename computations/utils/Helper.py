@@ -53,10 +53,10 @@ class Helper(object):
 
     #  m/s. T1 and T2
     @staticmethod
-    def get_speed(t1, t2, type):
-        if type == Constants.Type.BALL:
+    def get_speed(t1, t2, i_type):
+        if i_type == Constants.Type.BALL:
             return Helper.get_ball_speed(t1, t2)
-        elif type == Constants.Type.WHEEL:
+        elif i_type == Constants.Type.WHEEL:
             return Helper.get_wheel_speed(t1, t2)
         else:
             raise CriticalException("Unknown type.")

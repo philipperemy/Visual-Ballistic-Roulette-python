@@ -2,7 +2,6 @@ from Exceptions import *
 
 
 class Wheel(object):
-    #
     # 	 * Roulette numbers represented as a 1D-vector. Each number is accessed with
     # 	 * its index. Arithmetic operations are made on the indexes. For example.
     # 	 * Index of 0 is 0. Index of 32 is 1. Distance(0,32) = 1 - 0 = 1

@@ -46,14 +46,14 @@ class DatabaseAccessor(object):
         return self.get_last_session_id()
 
     def get_outcome(self, session_id):
-        query = "SELECT * FROM `outcomes` WHERE SESSION_ID = " + str(session_id) + ";"
+        query = "SELECT NUMBER FROM `outcomes` WHERE SESSION_ID = " + str(session_id) + ";"
         for row in self.connect.execute(query):
-            return row['NUMBER']
+            return int(row[0])
 
     def get_session_ids(self):
         ids = []
-        for row in self.connect.execute("SELECT ID from session ORDER BY id DESC LIMIT 1"):
-            ids.append(row['ID'])
+        for row in self.connect.execute("SELECT ID from session ORDER BY id ASC"):
+            ids.append(row[0])
         return ids
 
     def get_last_session_id(self):

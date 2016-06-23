@@ -5,7 +5,24 @@ from utils.Logging import *
 
 class PredictorPhysicsConstantDeceleration(object):
     @staticmethod
-    def predict(ball_cumsum_times, wheel_cumsum_times):
+    def predict_most_probable_number(ball_cumsum_times, wheel_cumsum_times, debug=False):
+
+        if len(wheel_cumsum_times) < Constants.MIN_NUMBER_OF_WHEEL_TIMES_BEFORE_PREDICTION:
+            raise SessionNotReadyException()
+
+        if len(ball_cumsum_times) < Constants.MIN_NUMBER_OF_BALL_TIMES_BEFORE_PREDICTION:
+            raise SessionNotReadyException()
+
+        # in seconds.
+        ball_cumsum_times = np.array(Helper.convert_to_seconds(ball_cumsum_times))
+        wheel_cumsum_times = np.array(Helper.convert_to_seconds(wheel_cumsum_times))
+
+        most_probable_number = PredictorPhysicsConstantDeceleration.predict(ball_cumsum_times, wheel_cumsum_times,
+                                                                            debug)
+        return most_probable_number
+
+    @staticmethod
+    def predict(ball_cumsum_times, wheel_cumsum_times, debug):
         cutoff_speed = Constants.CUTOFF_SPEED
         origin_time_ball = ball_cumsum_times[0]
 
@@ -14,7 +31,7 @@ class PredictorPhysicsConstantDeceleration(object):
         wheel_cumsum_times = Helper.normalize(wheel_cumsum_times, origin_time_wheel)
         diff_origin = origin_time_ball - origin_time_wheel
         last_time_ball_passes_in_front_of_ref = ball_cumsum_times[-1]
-        log('Reference time of prediction = {} s'.format(last_time_ball_passes_in_front_of_ref))
+        log('Reference time of prediction = {} s'.format(last_time_ball_passes_in_front_of_ref), debug)
         ball_diff_times = Helper.compute_diff(ball_cumsum_times)
         wheel_diff_times = Helper.compute_diff(wheel_cumsum_times)
         ball_model = HelperConstantDeceleration.compute_model(ball_diff_times)
@@ -44,9 +61,9 @@ class PredictorPhysicsConstantDeceleration(object):
                                                                   phase_at_cut_off,
                                                                   Constants.DEFAULT_WHEEL_WAY)
         adjusted_initial_phase = int((Constants.DEFAULT_SHIFT_PHASE * last_known_speed_wheel))
-        log("Number of pockets (computed from angle) = {}".format(shift_phase_between_initial_time_and_cut_off))
-        log("adjusted_initial_phase = {}".format(adjusted_initial_phase))
+        log("Number of pockets (computed from angle) = {}".format(shift_phase_between_initial_time_and_cut_off), debug)
+        log("adjusted_initial_phase = {}".format(adjusted_initial_phase), debug)
         predicted_number = Wheel.get_number_with_phase(number_below_ball_at_cutoff, adjusted_initial_phase,
                                                        Constants.DEFAULT_WHEEL_WAY)
-        log("predicted_number is = {}".format(predicted_number))
+        log("predicted_number is = {}".format(predicted_number), debug)
         return predicted_number

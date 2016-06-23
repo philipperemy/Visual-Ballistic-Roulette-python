@@ -32,8 +32,8 @@ class Constants(object):
     #  There is only one way we accept in the games. Never change this.
     DEFAULT_WHEEL_WAY = Wheel.WheelWay.ANTICLOCKWISE
     DATABASE_NAME = 'roulette-test.db'
-    TIME_LEFT_FOR_PLACING_BETS_SECONDS = 2
+    TIME_LEFT_FOR_PLACING_BETS_SECONDS = 0
 
     #  Physics
-    CUTOFF_SPEED = 0.75
-    DEFAULT_SHIFT_PHASE = 77
+    CUTOFF_SPEED = 0.95
+    DEFAULT_SHIFT_PHASE = 25

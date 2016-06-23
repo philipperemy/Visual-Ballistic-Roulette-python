@@ -47,24 +47,6 @@ da = DatabaseAccessor()
 sm.init(da)
 
 
-def predict_most_probable_number(session_id):
-    ball_cumsum_times = da.select_ball_lap_times(session_id)
-    wheel_cumsum_times = da.select_wheel_lap_times(session_id)
-
-    if len(wheel_cumsum_times) < Constants.MIN_NUMBER_OF_WHEEL_TIMES_BEFORE_PREDICTION:
-        raise SessionNotReadyException()
-
-    if len(ball_cumsum_times) < Constants.MIN_NUMBER_OF_BALL_TIMES_BEFORE_PREDICTION:
-        raise SessionNotReadyException()
-
-    # in seconds.
-    ball_cumsum_times = np.array(Helper.convert_to_seconds(ball_cumsum_times))
-    wheel_cumsum_times = np.array(Helper.convert_to_seconds(wheel_cumsum_times))
-
-    most_probable_number = PredictorPhysicsConstantDeceleration.predict(ball_cumsum_times, wheel_cumsum_times)
-    return most_probable_number
-
-
 @app.after_request
 def after_request(resp):
     """http://stackoverflow.com/a/28923164"""
@@ -132,7 +114,10 @@ class ResponseRoulette(Resource):
                 log('New outcome inserted. Session id = {}, outcome = {}'.format(session_id, outcome))
 
             # Predict outcome workflow.
-            predicted_number = predict_most_probable_number(session_id)
+            blt = da.select_ball_lap_times(session_id)
+            wlt = da.select_wheel_lap_times(session_id)
+            predicted_number = PredictorPhysicsConstantDeceleration.predict_most_probable_number(blt,
+                                                                                                 wlt)
             output = {'predicted_number': predicted_number,
                       'status': 'success'}
             log('Predicted number = {}, session id = {}'.format(predicted_number, session_id))

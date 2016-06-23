@@ -9,6 +9,10 @@ class HelperConstantDeceleration(object):
                                                                                           current_revolution,
                                                                                           cutoff_speed)
         revolution_count_floor = int(np.floor(revolution_count_left))
+
+        if revolution_count_floor > 100:
+            raise CriticalException()
+
         remaining_time = 0.0
         i = 1
         while i <= revolution_count_floor:

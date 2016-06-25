@@ -3,6 +3,8 @@
 import sys
 import time
 
+from scipy.optimize import minimize
+
 
 def add_all_folders_to_python_path():
     sys.path.append("./database")
@@ -15,7 +17,6 @@ add_all_folders_to_python_path()
 
 from database.DatabaseAccessor import *
 from computations.predictor.physics.constantdeceleration.PredictorPhysicsConstantDeceleration import *
-from computations.Wheel import *
 
 
 def current_time_millis():
@@ -30,8 +31,14 @@ for session_id in da.get_session_ids():
     BLT_PER_SESSION_ID[session_id] = da.select_ball_lap_times(session_id)
     WLT_PER_SESSION_ID[session_id] = da.select_wheel_lap_times(session_id)
 
-if __name__ == '__main__':
 
+def function_to_minimize(x):
+    import computations.Constants
+    Constants.CUTOFF_SPEED = x[0]
+    Constants.DEFAULT_SHIFT_PHASE = x[1]
+    Constants.WHEEL_DIAMETER = x[2]
+    Constants.CASE_DIAMETER = x[3]
+    reload(computations.Constants)
     dists_all = []
     for remove_ball_lap_id_from_end in range(0, 6, 1):
         dists = []
@@ -49,7 +56,19 @@ if __name__ == '__main__':
                 dists_all.append(dist)
             except Exception:
                 pass
-        print('remove_ball_lap_id_from_end = {}'.format(remove_ball_lap_id_from_end))
-        print('{} with len = {}'.format(dists, len(dists)))
-        print(np.mean(np.array(dists)))
-        print(np.mean(np.array(dists_all)))
+        # print('remove_ball_lap_id_from_end = {}'.format(remove_ball_lap_id_from_end))
+        # print('{} with len = {}'.format(dists, len(dists)))
+        # print(np.mean(np.array(dists)))
+
+    loss = np.mean(np.array(dists_all))
+    print('cs = {}, dsp = {}, wd = {}, cd = {}, loss = {}'.format(Constants.CUTOFF_SPEED,
+                                                                  Constants.DEFAULT_SHIFT_PHASE,
+                                                                  Constants.WHEEL_DIAMETER,
+                                                                  Constants.CASE_DIAMETER,
+                                                                  loss))
+    return loss
+
+
+if __name__ == '__main__':
+    x0 = (Constants.CUTOFF_SPEED, Constants.DEFAULT_SHIFT_PHASE, Constants.WHEEL_DIAMETER, Constants.CASE_DIAMETER)
+    res = minimize(fun=function_to_minimize, x0=x0, method='Nelder-Mead')

@@ -1,14 +1,17 @@
 from HelperConstantDeceleration import *
+from TimeSeriesMerger import *
 from computations.predictor.Phase import *
 from utils.Logging import *
 
 
 class PredictorPhysicsConstantDeceleration(object):
     FIXED_SLOPE = None
+    MEAN_SPEED_PER_REVOLUTION = None
 
     @staticmethod
     def load_cache(database):
         slopes = []
+        bcts = list()
         for session_id in database.get_session_ids():
             ball_cumsum_times = database.select_ball_lap_times(session_id)
             if len(ball_cumsum_times) >= Constants.MIN_NUMBER_OF_BALL_TIMES_BEFORE_PREDICTION:
@@ -16,10 +19,15 @@ class PredictorPhysicsConstantDeceleration(object):
                 ball_diff_times = Helper.compute_diff(ball_cumsum_times)
                 ball_model = HelperConstantDeceleration.compute_model(ball_diff_times)
                 slopes.append(ball_model.coef_[0, 0])
+                bcts.append(np.apply_along_axis(func1d=Helper.get_ball_speed, axis=0, arr=ball_diff_times))
         print('slopes = {}'.format(slopes))
         mean_slopes = np.mean(slopes)
         print('mean slopes = {}'.format(mean_slopes))
+
+        mean_speed_per_revolution = np.nanmean(TimeSeriesMerger.merge(bcts), axis=0)
+        # plt.plot(mean_speed_per_revolution)
         PredictorPhysicsConstantDeceleration.FIXED_SLOPE = mean_slopes
+        PredictorPhysicsConstantDeceleration.MEAN_SPEED_PER_REVOLUTION = mean_speed_per_revolution
 
     @staticmethod
     def predict_most_probable_number(ball_cumsum_times, wheel_cumsum_times, debug=False):

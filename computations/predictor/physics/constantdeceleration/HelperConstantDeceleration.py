@@ -4,10 +4,7 @@ from Helper import *
 class HelperConstantDeceleration(object):
     #  We should be able to average the deceleration factor. The intercept should not change.
     @staticmethod
-    def estimate_time(constant_deceleration_model, current_revolution, cutoff_speed):
-        revolution_count_left = HelperConstantDeceleration.estimate_revolution_count_left(constant_deceleration_model,
-                                                                                          current_revolution,
-                                                                                          cutoff_speed)
+    def estimate_time(constant_deceleration_model, current_revolution, revolution_count_left):
         revolution_count_floor = int(np.floor(revolution_count_left))
 
         if revolution_count_floor > 100:
@@ -21,9 +18,9 @@ class HelperConstantDeceleration(object):
             i += 1
 
         revolution_count_residual = revolution_count_left - revolution_count_floor
-        speed_forecast_1 = constant_deceleration_model.predict(current_revolution + revolution_count_floor)[0, 0]
-        speed_forecast_2 = constant_deceleration_model.predict(current_revolution + revolution_count_floor + 1)[0, 0]
-        avg_speed_last_rev = 0.5 * speed_forecast_1 + 0.5 * speed_forecast_2
+        speed_1 = constant_deceleration_model.predict(current_revolution + revolution_count_floor)[0, 0]
+        speed_2 = constant_deceleration_model.predict(current_revolution + revolution_count_floor + 1)[0, 0]
+        avg_speed_last_rev = (1 - revolution_count_residual) * speed_1 + revolution_count_residual * speed_2
         remaining_time += revolution_count_residual * Helper.get_time_for_one_ball_loop(avg_speed_last_rev)
         return remaining_time
 

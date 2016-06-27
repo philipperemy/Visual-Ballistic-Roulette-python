@@ -30,9 +30,12 @@ for session_id in da.get_session_ids():
     WLT_PER_SESSION_ID[session_id] = da.select_wheel_lap_times(session_id)
 
 
-def mcmc(fun, x0, max_iter=1000):
+# -13.5%
+# cs = 0.89377152252, dsp = 7.48843073348, wd = 0.547, cd = 0.687, loss = 8.13082437276, len = 558
+# cs = 1.0535816322, dsp = 11.6969344401, wd = 0.547, cd = 0.687, loss = 8.09322033898, len = 472
+def mcmc(fun, x0, max_iter=100):
     chains = np.zeros((max_iter, len(x0)))
-    sigmas = np.array([0.2, 1, 0.1])
+    sigmas = np.array([0.2, 1])
     chains[0, :] = np.array(x0)
     l_prev = function_to_minimize(x0)
     for i in range(1, max_iter):
@@ -87,6 +90,10 @@ def function_to_minimize(x):
 
 if __name__ == '__main__':
     PredictorPhysicsConstantDeceleration.load_cache(database=da)
-    x0 = (0.7, 10, 0.6)
-    # res = minimize(fun=function_to_minimize, x0=x0, method='Nelder-Mead')
-    mcmc(fun=function_to_minimize, x0=x0)
+
+    while True:
+        s = np.random.uniform(0, 2)
+        p = np.random.uniform(0, 35 * 2)
+        x0 = (s, p)
+        mcmc(fun=function_to_minimize, x0=x0)
+        # res = minimize(fun=function_to_minimize, x0=x0, method='Nelder-Mead')

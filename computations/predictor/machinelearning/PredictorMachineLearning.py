@@ -1,6 +1,5 @@
-from computations.predictor.machinelearning.HelperMachineLearning import *
-
 from computations.predictor.Phase import *
+from computations.predictor.machinelearning.HelperMachineLearning import *
 from utils.Logging import *
 
 
@@ -51,6 +50,5 @@ class PredictorMachineLearning(object):
         return most_probable_number
 
     @staticmethod
-    def predict(ball_cumsum_times, wheel_cumsum_times):
-
+    def predict(ball_cumsum_times, wheel_cumsum_times, database):
         return 0

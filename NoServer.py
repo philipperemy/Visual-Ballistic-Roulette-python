@@ -3,8 +3,6 @@
 import sys
 import time
 
-from scipy.optimize import minimize
-
 
 def add_all_folders_to_python_path():
     sys.path.append("./database")
@@ -32,12 +30,29 @@ for session_id in da.get_session_ids():
     WLT_PER_SESSION_ID[session_id] = da.select_wheel_lap_times(session_id)
 
 
+def mcmc(fun, x0, max_iter=1000):
+    chains = np.zeros((max_iter, len(x0)))
+    sigmas = np.array([0.2, 1, 0.1])
+    chains[0, :] = np.array(x0)
+    l_prev = function_to_minimize(x0)
+    for i in range(1, max_iter):
+        new_prop = chains[i - 1, :] + sigmas * np.random.normal(0, 1, len(x0))
+        l = function_to_minimize(list(new_prop))
+        # if np.random.random(1) < np.exp(l_prev - l):
+        if l < l_prev:
+            chains[i, :] = new_prop
+            l_prev = l
+            print('chain = {}, loss = {}'.format(chains[i, :], l_prev))
+        else:
+            chains[i, :] = chains[i - 1, :]
+
+
 def function_to_minimize(x):
     import computations.Constants
     Constants.CUTOFF_SPEED = x[0]
     Constants.DEFAULT_SHIFT_PHASE = x[1]
-    Constants.WHEEL_DIAMETER = x[2]
-    Constants.CASE_DIAMETER = x[2] * 1.255  # ratio.
+    # Constants.WHEEL_DIAMETER = x[2]
+    # Constants.CASE_DIAMETER = x[2] * 1.255  # ratio.
     reload(computations.Constants)
     dists_all = []
     for remove_ball_lap_id_from_end in range(0, 6, 1):
@@ -61,14 +76,17 @@ def function_to_minimize(x):
                 # print(np.mean(np.array(dists)))
 
     loss = np.mean(np.array(dists_all))
-    print('cs = {}, dsp = {}, wd = {}, cd = {}, loss = {}'.format(Constants.CUTOFF_SPEED,
-                                                                  Constants.DEFAULT_SHIFT_PHASE,
-                                                                  Constants.WHEEL_DIAMETER,
-                                                                  Constants.CASE_DIAMETER,
-                                                                  loss))
+    print('cs = {}, dsp = {}, wd = {}, cd = {}, loss = {}, len = {}'.format(Constants.CUTOFF_SPEED,
+                                                                            Constants.DEFAULT_SHIFT_PHASE,
+                                                                            Constants.WHEEL_DIAMETER,
+                                                                            Constants.CASE_DIAMETER,
+                                                                            loss,
+                                                                            len(dists_all)))
     return loss
 
 
 if __name__ == '__main__':
-    x0 = (Constants.CUTOFF_SPEED, Constants.DEFAULT_SHIFT_PHASE, Constants.WHEEL_DIAMETER)
-    res = minimize(fun=function_to_minimize, x0=x0, method='Nelder-Mead')
+    PredictorPhysicsConstantDeceleration.load_cache(database=da)
+    x0 = (0.7, 10, 0.6)
+    # res = minimize(fun=function_to_minimize, x0=x0, method='Nelder-Mead')
+    mcmc(fun=function_to_minimize, x0=x0)

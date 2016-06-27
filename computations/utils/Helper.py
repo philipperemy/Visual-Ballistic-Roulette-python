@@ -16,9 +16,11 @@ class Helper(object):
 
     @staticmethod
     def get_last_time_wheel_is_in_front_of_ref(wheel_lap_times, ball_lap_time_in_front_of_ref):
-        # index starts at 0.
-        idx = np.sum(np.array(np.array(wheel_lap_times) < ball_lap_time_in_front_of_ref, dtype=int)) - 1
-        return wheel_lap_times[idx]
+        res = None
+        for wheel_time_in_front_of_ref in wheel_lap_times:
+            if wheel_time_in_front_of_ref < ball_lap_time_in_front_of_ref:
+                res = wheel_time_in_front_of_ref
+        return res
 
     @staticmethod
     def compute_diff(lap_times):

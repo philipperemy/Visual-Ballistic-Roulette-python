@@ -16,6 +16,8 @@ class TestHelper(unittest.TestCase):
         ball_lap_time_in_front_of_ref = 12.5
         self.assertEqual(12.0,
                          Helper.get_last_time_wheel_is_in_front_of_ref(wheel_lap_times, ball_lap_time_in_front_of_ref))
+        self.assertEqual(None,
+                     Helper.get_last_time_wheel_is_in_front_of_ref(wheel_lap_times, 9.0))
 
     def test_compute_diff(self):
         #  In meter/second

@@ -92,8 +92,8 @@ if __name__ == '__main__':
     PredictorPhysicsConstantDeceleration.load_cache(database=da)
 
     while True:
-        s = np.random.uniform(0, 2)
-        p = np.random.uniform(0, 35 * 2)
+        s = np.random.uniform(1, 2)
+        p = np.random.uniform(0, 35)
         x0 = (s, p)
-        mcmc(fun=function_to_minimize, x0=x0)
+        mcmc(fun=function_to_minimize, x0=(1.0, 11))
         # res = minimize(fun=function_to_minimize, x0=x0, method='Nelder-Mead')

@@ -7,6 +7,7 @@ from utils.Logging import *
 class PredictorPhysicsConstantDeceleration(object):
     FIXED_SLOPE = None
     MEAN_SPEED_PER_REVOLUTION = None
+    LINEAR_REGRESSION = True
 
     @staticmethod
     def load_cache(database):
@@ -49,6 +50,7 @@ class PredictorPhysicsConstantDeceleration(object):
     @staticmethod
     def predict(ball_cumsum_times, wheel_cumsum_times, debug):
         cutoff_speed = Constants.CUTOFF_SPEED
+        speeds_mean = PredictorPhysicsConstantDeceleration.MEAN_SPEED_PER_REVOLUTION
         """Think about merging all together and having the same time index."""
         last_wheel_lap_time_in_front_of_ref = Helper.get_last_time_wheel_is_in_front_of_ref(wheel_cumsum_times,
                                                                                             ball_cumsum_times[-1])
@@ -56,17 +58,33 @@ class PredictorPhysicsConstantDeceleration(object):
         log('Reference time of prediction = {} s'.format(last_time_ball_passes_in_front_of_ref), debug)
         ball_diff_times = Helper.compute_diff(ball_cumsum_times)
         wheel_diff_times = Helper.compute_diff(wheel_cumsum_times)
-
-        fixed_slope = PredictorPhysicsConstantDeceleration.FIXED_SLOPE
         ball_loop_count = len(ball_diff_times)
-        ball_model = HelperConstantDeceleration.compute_model(ball_diff_times, fixed_slope)
-        number_of_revolutions_left_ball = HelperConstantDeceleration.estimate_revolution_count_left(ball_model,
-                                                                                                    ball_loop_count,
-                                                                                                    cutoff_speed)
-        phase_at_cut_off = (number_of_revolutions_left_ball % 1) * len(Wheel.NUMBERS)
 
-        estimated_time_left = HelperConstantDeceleration.estimate_time(ball_model, ball_loop_count,
-                                                                       number_of_revolutions_left_ball)
+        if PredictorPhysicsConstantDeceleration.LINEAR_REGRESSION:
+            fixed_slope = PredictorPhysicsConstantDeceleration.FIXED_SLOPE
+            ball_model = HelperConstantDeceleration.compute_model(ball_diff_times, fixed_slope)
+            number_of_revolutions_left_ball = HelperConstantDeceleration.estimate_revolution_count_left(ball_model,
+                                                                                                        ball_loop_count,
+                                                                                                        cutoff_speed)
+            estimated_time_left = HelperConstantDeceleration.estimate_time(ball_model, ball_loop_count,
+                                                                           number_of_revolutions_left_ball)
+
+        else:
+            index_of_rev_start = HelperConstantDeceleration.compute_model_2(ball_diff_times, speeds_mean)
+            number_of_revolutions_left_ball = HelperConstantDeceleration.estimate_revolution_count_left_2(speeds_mean,
+                                                                                                          index_of_rev_start,
+                                                                                                          ball_loop_count,
+                                                                                                          cutoff_speed)
+            estimated_time_left = HelperConstantDeceleration.estimate_time_2(speeds_mean,
+                                                                             index_of_rev_start,
+                                                                             ball_loop_count,
+                                                                             number_of_revolutions_left_ball)
+
+        print('number_of_revolutions_left_ball={}'.format(number_of_revolutions_left_ball))
+        print('estimated_time_left={}'.format(estimated_time_left))
+        print('________________________________')
+
+        phase_at_cut_off = (number_of_revolutions_left_ball % 1) * len(Wheel.NUMBERS)
         time_at_cutoff_ball = last_time_ball_passes_in_front_of_ref + estimated_time_left
 
         if time_at_cutoff_ball < last_time_ball_passes_in_front_of_ref + Constants.TIME_LEFT_FOR_PLACING_BETS_SECONDS:

@@ -18,7 +18,7 @@ class TimeSeriesMerger(object):
     def compute_loss(time_series, list_of_time_series):
         loss = 0.0
         for element in list_of_time_series:
-            loss += np.sum(np.array(time_series - element) ** 2)
+            loss += np.sum((np.array(time_series - element) ** 2) * np.array(time_series != 0, dtype=bool))
         return loss
 
     @staticmethod

@@ -6,9 +6,9 @@ PI = 3.14159265359
 
 
 class Constants(object):
-    # TODO: To be measured. All is in meters and seconds.
-    WHEEL_DIAMETER = 0.547
-    CASE_DIAMETER = 0.687
+
+    WHEEL_DIAMETER = 1
+    CASE_DIAMETER = 1.0
 
     @staticmethod
     def get_wheel_circumference():
@@ -31,9 +31,9 @@ class Constants(object):
 
     #  There is only one way we accept in the games. Never change this.
     DEFAULT_WHEEL_WAY = Wheel.WheelWay.ANTICLOCKWISE
-    DATABASE_NAME = 'roulette-test.db'
+    DATABASE_NAME = 'roulette-experiment.db'
     TIME_LEFT_FOR_PLACING_BETS_SECONDS = 0
 
     #  Physics
-    CUTOFF_SPEED = 0.95
-    DEFAULT_SHIFT_PHASE = 25
+    DIFF_TIMES = 2.42
+    DEFAULT_SHIFT_PHASE = 37

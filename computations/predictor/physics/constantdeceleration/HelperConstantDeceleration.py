@@ -46,7 +46,8 @@ class HelperConstantDeceleration(object):
     @staticmethod
     def estimate_revolution_count_left_2(speeds_mean, index_start_of_speeds_mean, current_revolution, cutoff_speed):
         speeds_mean_fun = interp1d(range(len(speeds_mean)), speeds_mean - cutoff_speed)
-        revolution_count_left = HelperConstantDeceleration.find_zero(speeds_mean_fun, a=0, b=len(speeds_mean))
+        revolution_count_left = HelperConstantDeceleration.find_zero(speeds_mean_fun, a=0,
+                                                                     b=len(speeds_mean)) + 1  # starts at 0
         revolution_count_left -= (current_revolution + index_start_of_speeds_mean)
         if revolution_count_left < 0:
             raise PositiveValueExpectedException()
@@ -62,8 +63,8 @@ class HelperConstantDeceleration(object):
         remaining_time = 0.0
         i = 1
         while i <= revolution_count_floor:
-            speed_forecast = constant_deceleration_model.predict(current_revolution + i)[0, 0]
-            remaining_time += Helper.get_time_for_one_ball_loop(speed_forecast)
+            time_left_forecast = constant_deceleration_model.predict(current_revolution + i)[0, 0]
+            remaining_time += time_left_forecast  # lose a lot of info there.
             i += 1
 
         revolution_count_residual = revolution_count_left - revolution_count_floor
@@ -74,7 +75,7 @@ class HelperConstantDeceleration(object):
         if avg_speed_last_rev < 0.0:
             raise PositiveValueExpectedException()
 
-        remaining_time += revolution_count_residual * Helper.get_time_for_one_ball_loop(avg_speed_last_rev)
+        remaining_time += revolution_count_residual * avg_speed_last_rev
         return remaining_time
 
     @staticmethod
@@ -89,12 +90,11 @@ class HelperConstantDeceleration(object):
     @staticmethod
     def compute_model(diff_times, slope=None):
         x = np.array(range(1, len(diff_times) + 1, 1))  # [1, 2, 3, ..., size_of_speeds_array]
-        speeds = np.apply_along_axis(func1d=Helper.get_ball_speed, axis=0, arr=diff_times)
         if slope is None:
-            return Helper.perform_regression(x, speeds)
+            return Helper.perform_regression(x, diff_times)
         else:
             # http://stackoverflow.com/questions/33292969/linear-regression-with-specified-slope
-            intercept = np.mean(speeds - slope * x)
+            intercept = np.mean(diff_times - slope * x)
             return Helper.perform_regression(x, slope * x + intercept)  # trick
 
     @staticmethod

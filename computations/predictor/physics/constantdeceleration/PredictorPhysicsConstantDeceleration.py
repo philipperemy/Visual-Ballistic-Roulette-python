@@ -18,8 +18,16 @@ class PredictorPhysicsConstantDeceleration(object):
             if len(ball_cumsum_times) >= Constants.MIN_NUMBER_OF_BALL_TIMES_BEFORE_PREDICTION:
                 ball_cumsum_times = np.array(Helper.convert_to_seconds(ball_cumsum_times))
                 ball_diff_times = Helper.compute_diff(ball_cumsum_times)
-                ball_model = HelperConstantDeceleration.compute_model(ball_diff_times)
+
+                regress = ball_diff_times[-3:]
+
+                ball_model = HelperConstantDeceleration.compute_model(regress)
                 slopes.append(ball_model.coef_[0, 0])
+
+                # import matplotlib.pyplot as plt
+                # plt.plot(regress)
+                # plt.show()
+
                 bcts.append(np.apply_along_axis(func1d=Helper.get_ball_speed, axis=0, arr=ball_diff_times))
         print('slopes = {}'.format(slopes))
         mean_slopes = np.mean(slopes)
@@ -49,9 +57,9 @@ class PredictorPhysicsConstantDeceleration(object):
 
     @staticmethod
     def predict(ball_cumsum_times, wheel_cumsum_times, debug):
-        cutoff_speed = Constants.CUTOFF_SPEED
+        cutoff_speed = Constants.DIFF_TIMES
         speeds_mean = PredictorPhysicsConstantDeceleration.MEAN_SPEED_PER_REVOLUTION
-        """Think about merging all together and having the same time index."""
+
         last_wheel_lap_time_in_front_of_ref = Helper.get_last_time_wheel_is_in_front_of_ref(wheel_cumsum_times,
                                                                                             ball_cumsum_times[-1])
         last_time_ball_passes_in_front_of_ref = ball_cumsum_times[-1]
@@ -99,7 +107,7 @@ class PredictorPhysicsConstantDeceleration(object):
         shift_between_initial_time_and_cutoff = ((estimated_time_left / wheel_diff_times[-1]) % 1) * len(
             Wheel.NUMBERS)
 
-        expected_bouncing_shift = (Constants.DEFAULT_SHIFT_PHASE * constant_wheel_speed)
+        expected_bouncing_shift = 16  # (Constants.DEFAULT_SHIFT_PHASE * constant_wheel_speed)
         final_phase_to_add = phase_at_cut_off + shift_between_initial_time_and_cutoff + expected_bouncing_shift
         final_phase_to_add = int(np.round(final_phase_to_add))
 

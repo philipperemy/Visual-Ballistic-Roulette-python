@@ -52,7 +52,7 @@ def mcmc(fun, x0, max_iter=100):
 
 def function_to_minimize(x):
     import computations.Constants
-    Constants.CUTOFF_SPEED = x[0]
+    Constants.DIFF_TIMES = x[0]
     Constants.DEFAULT_SHIFT_PHASE = x[1]
     # Constants.WHEEL_DIAMETER = x[2]
     # Constants.CASE_DIAMETER = x[2] * 1.255  # ratio.
@@ -79,7 +79,7 @@ def function_to_minimize(x):
                 # print(np.mean(np.array(dists)))
 
     loss = np.mean(np.array(dists_all))
-    print('cs = {}, dsp = {}, wd = {}, cd = {}, loss = {}, len = {}'.format(Constants.CUTOFF_SPEED,
+    print('cs = {}, dsp = {}, wd = {}, cd = {}, loss = {}, len = {}'.format(Constants.DIFF_TIMES,
                                                                             Constants.DEFAULT_SHIFT_PHASE,
                                                                             Constants.WHEEL_DIAMETER,
                                                                             Constants.CASE_DIAMETER,

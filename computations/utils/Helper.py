@@ -7,6 +7,10 @@ from Exceptions import *
 
 class Helper(object):
     @staticmethod
+    def round_digits(l):
+        return '[' + ', '.join(['%.4f' % item for item in l]) + ']'
+
+    @staticmethod
     def convert_to_seconds(milliseconds):
         return np.array([1e-3 * x for x in milliseconds])
 

@@ -29,9 +29,9 @@ class PredictorPhysicsConstantDeceleration(object):
                 # plt.show()
 
                 bcts.append(np.apply_along_axis(func1d=Helper.get_ball_speed, axis=0, arr=ball_diff_times))
-        print('slopes = {}'.format(slopes))
+        log('slopes = {}'.format(Helper.round_digits(slopes)))
         mean_slopes = np.mean(slopes)
-        print('mean slopes = {}'.format(mean_slopes))
+        log('mean slopes = {}'.format(mean_slopes))
 
         mean_speed_per_revolution = np.nanmean(TimeSeriesMerger.merge(bcts), axis=0)
         # plt.plot(mean_speed_per_revolution)
@@ -88,12 +88,12 @@ class PredictorPhysicsConstantDeceleration(object):
                                                                              ball_loop_count,
                                                                              number_of_revolutions_left_ball)
 
-        print('number_of_revolutions_left_ball={}'.format(number_of_revolutions_left_ball))
-        print('estimated_time_left={}'.format(estimated_time_left))
-        print('________________________________')
+        log('number_of_revolutions_left_ball = {}'.format(number_of_revolutions_left_ball))
+        log('estimated_time_left={}'.format(estimated_time_left))
+        log('________________________________')
 
         diamond = HelperConstantDeceleration.detect_diamonds(number_of_revolutions_left_ball)
-        print('Diamond to be hit = {}'.format(diamond))
+        log('Diamond to be hit = {}'.format(diamond))
 
         if diamond == 'BLOCKER':
             expected_bouncing_shift = 6

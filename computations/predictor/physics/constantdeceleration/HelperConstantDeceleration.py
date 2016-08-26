@@ -111,7 +111,7 @@ class HelperConstantDeceleration(object):
         diamonds = np.cumsum(np.ones(8) * 0.125)
         diamond_types = ['FORWARD', 'BLOCKER'] * 4
         distance_from_diamonds = np.array(diamonds - res_distance_left) ** 2
-        index = np.argmin(distance_from_diamonds) + 1  # + 1 is for the intrinsic speed.
+        index = np.argmin(distance_from_diamonds) + 1  # + 1 is for the intrinsic speed. might be a hyperparameter.
         if index == len(diamond_types):
             index = 0
         return diamond_types[index]

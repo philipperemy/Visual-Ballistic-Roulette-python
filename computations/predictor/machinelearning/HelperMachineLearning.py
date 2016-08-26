@@ -1,7 +1,7 @@
 from computations.predictor.Phase import *
 from utils.Logging import *
 
-
+# code not used.
 class HelperMachineLearning(object):
     @staticmethod
     def build_data_records(ball_cumsum_times, wheel_cumsum_times):
@@ -9,6 +9,7 @@ class HelperMachineLearning(object):
         if len(ball_cumsum_times) == 0 or len(wheel_cumsum_times) == 0:
             return data_records
 
+        # no more normalisation like this.
         origin_time_ball = ball_cumsum_times[0]
         ball_cumsum_times = Helper.normalize(ball_cumsum_times, origin_time_ball)
 
@@ -20,6 +21,7 @@ class HelperMachineLearning(object):
         ball_diff_times = Helper.compute_diff(ball_cumsum_times)
         range_ball = range(1, len(ball_diff_times) + 1)
 
+        # not used. TODO bug.
         ball_speed_model = Helper.perform_regression(range_ball, ball_diff_times)
 
         wheel_diff_times = Helper.compute_diff(wheel_cumsum_times)

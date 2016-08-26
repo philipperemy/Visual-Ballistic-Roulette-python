@@ -42,9 +42,8 @@ class Parameters(object):
 app = Flask(__name__)
 api = Api(app)
 
-sm = SessionManager()
 da = DatabaseAccessor()
-sm.init(da)
+sm = SessionManager(da)
 
 
 @app.after_request

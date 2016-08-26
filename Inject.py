@@ -31,7 +31,7 @@ WS_2 = np.array([03.316, 08.216, 13.450]) * 1000
 # HIT 18.316. Phase is 36.
 
 try:
-    os.remove('roulette-experiment.db')
+    os.remove(Constants.DATABASE_NAME)
 except OSError:
     pass
 

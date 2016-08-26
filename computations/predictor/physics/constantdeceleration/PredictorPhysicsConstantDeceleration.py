@@ -16,7 +16,7 @@ class PredictorPhysicsConstantDeceleration(object):
         for session_id in database.get_session_ids():
             ball_cumsum_times = database.select_ball_lap_times(session_id)
             if len(ball_cumsum_times) >= Constants.MIN_NUMBER_OF_BALL_TIMES_BEFORE_PREDICTION:
-                ball_cumsum_times = np.array(Helper.convert_to_seconds(ball_cumsum_times))
+                ball_cumsum_times = Helper.convert_to_seconds(ball_cumsum_times)
                 ball_diff_times = Helper.compute_diff(ball_cumsum_times)
 
                 regress = ball_diff_times[-3:]
@@ -48,8 +48,8 @@ class PredictorPhysicsConstantDeceleration(object):
             raise SessionNotReadyException()
 
         # in seconds.
-        ball_cumsum_times = np.array(Helper.convert_to_seconds(ball_cumsum_times))
-        wheel_cumsum_times = np.array(Helper.convert_to_seconds(wheel_cumsum_times))
+        ball_cumsum_times = Helper.convert_to_seconds(ball_cumsum_times)
+        wheel_cumsum_times = Helper.convert_to_seconds(wheel_cumsum_times)
 
         most_probable_number = PredictorPhysicsConstantDeceleration.predict(ball_cumsum_times, wheel_cumsum_times,
                                                                             debug)
@@ -103,7 +103,7 @@ class PredictorPhysicsConstantDeceleration(object):
         phase_at_cut_off = (number_of_revolutions_left_ball % 1) * len(Wheel.NUMBERS)
         time_at_cutoff_ball = last_time_ball_passes_in_front_of_ref + estimated_time_left
 
-        if time_at_cutoff_ball < last_time_ball_passes_in_front_of_ref + Constants.TIME_LEFT_FOR_PLACING_BETS_SECONDS:
+        if time_at_cutoff_ball < last_time_ball_passes_in_front_of_ref + Constants.SECONDS_NEEDED_TO_PLACE_BETS:
             raise PositiveValueExpectedException()
 
         constant_wheel_speed = Helper.get_wheel_speed(wheel_diff_times[-1])

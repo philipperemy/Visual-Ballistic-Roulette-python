@@ -52,12 +52,12 @@ class DatabaseAccessor(object):
 
     def get_session_ids(self):
         ids = []
-        for row in self.connect.execute("SELECT ID from session ORDER BY id ASC"):
+        for row in self.connect.execute("SELECT ID FROM session ORDER BY id ASC"):
             ids.append(row[0])
         return ids
 
     def get_last_session_id(self):
-        for row in self.connect.execute("SELECT ID from session ORDER BY id DESC LIMIT 1"):
+        for row in self.connect.execute("SELECT ID FROM session ORDER BY id DESC LIMIT 1"):
             return row[0]
 
     def select_ball_lap_times(self, session_id):

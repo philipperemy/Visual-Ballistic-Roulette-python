@@ -5,7 +5,7 @@ from computations.utils.Helper import *
 
 class TestHelper(unittest.TestCase):
     def test_convert_to_seconds(self):
-        self.assertListEqual([1.0, 1.01, 1.02], Helper.convert_to_seconds([1000.0, 1010.0, 1020.0]))
+        self.assertListEqual([1.0, 1.01, 1.02], list(Helper.convert_to_seconds([1000.0, 1010.0, 1020.0])))
 
     def test_print(self):
         self.assertEqual('+oo', Helper.print_val_or_infinity_symbol(30000000000))

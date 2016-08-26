@@ -4,7 +4,7 @@ import numpy as np
 # In[14]:
 
 np.random.seed(42)
-xs = np.linspace(0, 2, 10000)
+xs = np.array(np.linspace(0, 2, 10000))
 f = np.exp(-xs)
 # plt.plot(xs, f)
 # plt.show()

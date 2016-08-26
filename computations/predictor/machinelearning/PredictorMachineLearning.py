@@ -12,8 +12,8 @@ class PredictorMachineLearning(object):
     def load_cache(database):
 
         for session_id in database.get_session_ids():
-            ball_cumsum_times = np.array(Helper.convert_to_seconds(database.select_ball_lap_times()))
-            wheel_cumsum_times = np.array(Helper.convert_to_seconds(database.select_wheel_lap_times()))
+            ball_cumsum_times = Helper.convert_to_seconds(database.select_ball_lap_times())
+            wheel_cumsum_times = Helper.convert_to_seconds(database.select_wheel_lap_times())
 
             if len(wheel_cumsum_times) == 0:
                 log("Wheel cumsum times are empty for session id = {}. Ignoring this game.".format(session_id))
@@ -39,8 +39,8 @@ class PredictorMachineLearning(object):
             raise SessionNotReadyException()
 
         # in seconds.
-        ball_cumsum_times = np.array(Helper.convert_to_seconds(ball_cumsum_times))
-        wheel_cumsum_times = np.array(Helper.convert_to_seconds(wheel_cumsum_times))
+        ball_cumsum_times = Helper.convert_to_seconds(ball_cumsum_times)
+        wheel_cumsum_times = Helper.convert_to_seconds(wheel_cumsum_times)
 
         if PredictorMachineLearning.CACHE is None:
             PredictorMachineLearning.load_cache(database)

@@ -6,6 +6,11 @@ class Measure(object):
     actual = None
 
 
+# The algorithm can be split into two parts:
+# - deterministic part
+# - probabilistic part
+# For each part, a measure should be derived. This is the only way to calibrate it efficiently.
+
 # * Computes the angular distance between the expected number and the number
 #  * the algorithm outputs.
 #  * Example: metrics(32,32) = 0

@@ -38,7 +38,7 @@ WS_4 = np.array([02.566, 07.933, 13.366]) * 1000
 # final is 18. phase at cutoff is 22.
 
 try:
-    os.remove('roulette-experiment.db')
+    os.remove(Constants.DATABASE_NAME)
 except OSError:
     pass
 

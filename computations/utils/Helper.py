@@ -8,7 +8,7 @@ from Exceptions import *
 class Helper(object):
     @staticmethod
     def convert_to_seconds(milliseconds):
-        return [1e-3 * x for x in milliseconds]
+        return np.array([1e-3 * x for x in milliseconds])
 
     @staticmethod
     def print_val_or_infinity_symbol(value):

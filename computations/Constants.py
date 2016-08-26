@@ -35,5 +35,5 @@ class Constants(object):
     TIME_LEFT_FOR_PLACING_BETS_SECONDS = 0
 
     #  Physics
-    DIFF_TIMES = 2.42
+    DIFF_TIMES = 2.42 - 0.05
     DEFAULT_SHIFT_PHASE = 37

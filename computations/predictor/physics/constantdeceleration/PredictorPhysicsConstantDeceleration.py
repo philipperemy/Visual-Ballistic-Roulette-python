@@ -25,7 +25,7 @@ class PredictorPhysicsConstantDeceleration(object):
                 slopes.append(ball_model.coef_[0, 0])
 
                 # import matplotlib.pyplot as plt
-                # plt.plot(regress)
+                # plt.plot(ball_diff_times)
                 # plt.show()
 
                 bcts.append(np.apply_along_axis(func1d=Helper.get_ball_speed, axis=0, arr=ball_diff_times))
@@ -92,6 +92,14 @@ class PredictorPhysicsConstantDeceleration(object):
         print('estimated_time_left={}'.format(estimated_time_left))
         print('________________________________')
 
+        diamond = HelperConstantDeceleration.detect_diamonds(number_of_revolutions_left_ball)
+        print('Diamond to be hit = {}'.format(diamond))
+
+        if diamond == 'BLOCKER':
+            expected_bouncing_shift = 6
+        else:
+            expected_bouncing_shift = 16
+
         phase_at_cut_off = (number_of_revolutions_left_ball % 1) * len(Wheel.NUMBERS)
         time_at_cutoff_ball = last_time_ball_passes_in_front_of_ref + estimated_time_left
 
@@ -107,7 +115,6 @@ class PredictorPhysicsConstantDeceleration(object):
         shift_between_initial_time_and_cutoff = ((estimated_time_left / wheel_diff_times[-1]) % 1) * len(
             Wheel.NUMBERS)
 
-        expected_bouncing_shift = 16  # (Constants.DEFAULT_SHIFT_PHASE * constant_wheel_speed)
         final_phase_to_add = phase_at_cut_off + shift_between_initial_time_and_cutoff + expected_bouncing_shift
         final_phase_to_add = int(np.round(final_phase_to_add))
 

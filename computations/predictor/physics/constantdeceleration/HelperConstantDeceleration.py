@@ -102,3 +102,30 @@ class HelperConstantDeceleration(object):
         speeds = np.apply_along_axis(func1d=Helper.get_ball_speed, axis=0, arr=diff_times)
         new_speeds = TimeSeriesMerger.find_index(speeds, mean_speeds)
         return np.where(new_speeds > 0)[0][0]
+
+    @staticmethod
+    def detect_diamonds(distance_left):
+        """beginning is assumed to be at the ref diamond. Ref diamond is FORWARD.
+        Ball is going anti-clockwise"""
+        res_distance_left = distance_left % 1
+        diamonds = np.cumsum(np.ones(8) * 0.125)
+        diamond_types = ['FORWARD', 'BLOCKER'] * 4
+        distance_from_diamonds = np.array(diamonds - res_distance_left) ** 2
+        index = np.argmin(distance_from_diamonds) + 1  # + 1 is for the intrinsic speed.
+        if index == len(diamond_types):
+            index = 0
+        return diamond_types[index]
+
+    # x = [1,2,3,4]
+    # y = [2,4,6,8]
+    #
+    # n_x = [0,1,2,2-6,6-10,10-18]
+    # n_y = [2,4,6,8]
+    @staticmethod
+    def x_axis_rev_to_real_time(y):
+        x = np.cumsum(y)
+        new_x = []
+        new_y = []
+        for i in range(max(x)):
+            new_x.append(i)
+            new_y.append(y[i])

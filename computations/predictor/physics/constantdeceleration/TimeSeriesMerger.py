@@ -56,4 +56,7 @@ if __name__ == '__main__':
 
     l1 = [1, 2, 3, 4]
     l2 = [0, 0, 0, 0, 1, 2, 3, 3, 0, 0, 0, 0]
-    print(TimeSeriesMerger.find_index(l1, l2))
+
+    a = TimeSeriesMerger.find_index(l1, l2)
+    print(a)
+    print(np.where(a > 0)[0][0])

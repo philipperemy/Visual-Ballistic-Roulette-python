@@ -5,7 +5,7 @@ from TimeSeriesMerger import *
 
 class HelperConstantDeceleration(object):
     @staticmethod
-    def estimate_time_2(speeds_mean, index_start_of_speeds_mean, current_revolution, revolution_count_left):
+    def estimate_time_2(speeds_mean, index_of_last_known_speed, revolution_count_left):
         revolution_count_floor = int(np.floor(revolution_count_left))
 
         if revolution_count_floor > 100:
@@ -14,14 +14,14 @@ class HelperConstantDeceleration(object):
         remaining_time = 0.0
         i = 1
         while i <= revolution_count_floor:
-            speed_forecast = speeds_mean[index_start_of_speeds_mean + current_revolution + i]
+            speed_forecast = speeds_mean[index_of_last_known_speed + i]
             remaining_time += Helper.get_time_for_one_ball_loop(speed_forecast)
             i += 1
 
         revolution_count_residual = revolution_count_left - revolution_count_floor
-        speed_1 = speeds_mean[index_start_of_speeds_mean + current_revolution + revolution_count_floor]
+        speed_1 = speeds_mean[index_of_last_known_speed + revolution_count_floor]
 
-        last_index = index_start_of_speeds_mean + current_revolution + revolution_count_floor + 1
+        last_index = index_of_last_known_speed + revolution_count_floor + 1
         if last_index >= len(speeds_mean):
             speed_2 = speed_1
         else:
@@ -44,14 +44,14 @@ class HelperConstantDeceleration(object):
                 return b
 
     @staticmethod
-    def estimate_revolution_count_left_2(speeds_mean, index_start_of_speeds_mean, current_revolution, cutoff_speed):
+    def estimate_revolution_count_left_2(speeds_mean, index_current_abs, cutoff_speed):
         speeds_mean_fun = interp1d(range(len(speeds_mean)), speeds_mean - cutoff_speed)
-        revolution_count_left = HelperConstantDeceleration.find_zero(speeds_mean_fun, a=0,
-                                                                     b=len(speeds_mean)) + 1  # starts at 0
-        revolution_count_left -= (current_revolution + index_start_of_speeds_mean)
-        if revolution_count_left < 0:
+        rev_count_left_absolute = HelperConstantDeceleration.find_zero(speeds_mean_fun, a=0,
+                                                                       b=len(speeds_mean)) + 1  # starts at 0
+        rev_count_left_absolute -= index_current_abs
+        if rev_count_left_absolute < 0:
             raise PositiveValueExpectedException()
-        return revolution_count_left
+        return rev_count_left_absolute
 
     @staticmethod
     def estimate_time(constant_deceleration_model, current_revolution, revolution_count_left):

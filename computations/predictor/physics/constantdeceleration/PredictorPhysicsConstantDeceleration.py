@@ -7,7 +7,6 @@ from utils.Logging import *
 class PredictorPhysicsConstantDeceleration(object):
     FIXED_SLOPE = None
     MEAN_SPEED_PER_REVOLUTION = None
-    LINEAR_REGRESSION = True
 
     @staticmethod
     def load_cache(database):
@@ -68,25 +67,17 @@ class PredictorPhysicsConstantDeceleration(object):
         wheel_diff_times = Helper.compute_diff(wheel_cum_sum_times)
         ball_loop_count = len(ball_diff_times)
 
-        if PredictorPhysicsConstantDeceleration.LINEAR_REGRESSION:
-            fixed_slope = PredictorPhysicsConstantDeceleration.FIXED_SLOPE
-            ball_model = HelperConstantDeceleration.compute_model(ball_diff_times, fixed_slope)
-            number_of_revolutions_left_ball = HelperConstantDeceleration.estimate_revolution_count_left(ball_model,
-                                                                                                        ball_loop_count,
-                                                                                                        cutoff_speed)
-            estimated_time_left = HelperConstantDeceleration.estimate_time(ball_model, ball_loop_count,
-                                                                           number_of_revolutions_left_ball)
+        # check all indices
+        index_of_rev_start = HelperConstantDeceleration.compute_model_2(ball_diff_times, speeds_mean)
 
-        else:
-            index_of_rev_start = HelperConstantDeceleration.compute_model_2(ball_diff_times, speeds_mean)
-            number_of_revolutions_left_ball = HelperConstantDeceleration.estimate_revolution_count_left_2(speeds_mean,
-                                                                                                          index_of_rev_start,
-                                                                                                          ball_loop_count,
-                                                                                                          cutoff_speed)
-            estimated_time_left = HelperConstantDeceleration.estimate_time_2(speeds_mean,
-                                                                             index_of_rev_start,
-                                                                             ball_loop_count,
-                                                                             number_of_revolutions_left_ball)
+        # if we have [0, 0, 1, 2, 3, 0, 0], index_of_rev_start = 2, index_current_abs = 2 + 3 - 1 = 4
+        index_of_last_known_speed = ball_loop_count + index_of_rev_start - 1
+        number_of_revolutions_left_ball = HelperConstantDeceleration.estimate_revolution_count_left_2(speeds_mean,
+                                                                                                      index_of_last_known_speed,
+                                                                                                      cutoff_speed)
+        estimated_time_left = HelperConstantDeceleration.estimate_time_2(speeds_mean,
+                                                                         index_of_last_known_speed,
+                                                                         number_of_revolutions_left_ball)
 
         log('number_of_revolutions_left_ball = {}'.format(number_of_revolutions_left_ball))
         log('estimated_time_left = {}'.format(estimated_time_left))
@@ -126,9 +117,12 @@ class PredictorPhysicsConstantDeceleration(object):
         log("predicted_number is = {}".format(predicted_number), debug)
 
         # possibility to assess the error on:
+        # - PHASE 1
         # - number_of_revolutions_left_ball
         # - estimated_time_left
+        # - PHASE 2 - if both quantities are correct, we can estimate predicted_number_cutoff exactly (without any
+        # errors on the measurements).
         # - predicted_number_cutoff
-        # - predicted_number
+        # - predicted_number (less important)
         # - diamond: FORWARD, BLOCKER, NO_DIAMOND (position of the diamond)
         return predicted_number

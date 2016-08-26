@@ -63,9 +63,8 @@ train_loss = []
 for epoch in range(10):
     model.fit(inputs, outputs,
               batch_size=1, nb_epoch=10,
-              verbose=0, validation_data=(inputs, outputs))
+              verbose=1, validation_data=(inputs, outputs))
     train_loss.append(model.evaluate(inputs, outputs))
-    print(train_loss)
 
 # In[ ]:
 

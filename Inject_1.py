@@ -22,11 +22,11 @@ def current_time_millis():
 
 BS = np.array([02.183, 02.849, 03.566, 04.349, 05.166, 06.150, 07.383, 08.933, 10.733, 12.683, 14.916]) * 1000
 WS = np.array([05.066, 11.099, 17.299]) * 1000
-# final is 27. Phase at cutoff is 2.
+# final is 6. Phase at cutoff is 2.
 
 BS_2 = np.array([09.583, 10.366, 11.249, 12.266, 13.566, 15.216, 17.033, 19.116, 21.450]) * 1000
 WS_2 = np.array([11.049, 17.233]) * 1000
-# final is 15. Phase at cutoff is 7
+# final is 15. Phase at cutoff is 20. Hit FORWARD + BLOCKER.
 
 BS_3 = np.array([03.516, 04.299, 05.166, 06.166, 07.483, 09.150, 10.999, 13.083]) * 1000
 WS_3 = np.array([05.499, 12.299]) * 1000
@@ -76,7 +76,7 @@ for ws in WS_4:
 # then identify how long left with TS Merge.
 
 PredictorPhysicsConstantDeceleration.load_cache(da)
-PredictorPhysicsConstantDeceleration.predict_most_probable_number(BS[:-1], WS, debug=True)
+PredictorPhysicsConstantDeceleration.predict_most_probable_number(BS_2[:-1], WS_2, debug=True)
 # PredictorPhysicsConstantDeceleration.predict_most_probable_number(BS[:-2], WS, debug=True)
 # PredictorPhysicsConstantDeceleration.predict_most_probable_number(BS[:-3], WS, debug=True)
 # PredictorPhysicsConstantDeceleration.predict_most_probable_number(BS[:-4], WS, debug=True)

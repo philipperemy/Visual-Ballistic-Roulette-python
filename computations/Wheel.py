@@ -1,3 +1,5 @@
+import numpy as np
+
 from Exceptions import *
 
 
@@ -56,6 +58,7 @@ class Wheel(object):
     # 	 
     @staticmethod
     def get_number_with_phase(reference_number, phase_count, way):
+        phase_count = int(np.round(phase_count))
         idx_reference_number = Wheel.find_index_of_number(reference_number)
         if way == Wheel.WheelWay.CLOCKWISE:
             new_idx = idx_reference_number - phase_count

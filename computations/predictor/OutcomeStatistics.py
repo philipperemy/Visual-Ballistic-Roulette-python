@@ -1,7 +1,5 @@
 import collections
 
-import numpy as np
-
 from Wheel import *
 
 
@@ -12,7 +10,6 @@ class OutcomeStatistics(object):
     # 	 * the variance will be low and the prediction be accurate.
     @staticmethod
     def create(outcome_numbers):
-
         counter = collections.Counter(outcome_numbers)
 
         #  Reduce the Residuals Sum of Squares (RSS).

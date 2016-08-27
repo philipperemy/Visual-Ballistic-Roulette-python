@@ -1,8 +1,9 @@
 from computations.predictor.Phase import *
 from utils.Logging import *
 
-# code not used.
+
 class HelperMachineLearning(object):
+    # code not used.
     @staticmethod
     def build_data_records(ball_cumsum_times, wheel_cumsum_times):
         data_records = list()

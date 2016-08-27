@@ -46,8 +46,8 @@ class HelperConstantDeceleration(object):
     @staticmethod
     def estimate_revolution_count_left_2(speeds_mean, index_current_abs, cutoff_speed):
         speeds_mean_fun = interp1d(range(len(speeds_mean)), speeds_mean - cutoff_speed)
-        rev_count_left_absolute = HelperConstantDeceleration.find_zero(speeds_mean_fun, a=0,
-                                                                       b=len(speeds_mean)) + 1  # starts at 0
+        rev_count_left_absolute = HelperConstantDeceleration.find_zero(speeds_mean_fun, 0,
+                                                                       len(speeds_mean)) + 1  # starts at 0
         rev_count_left_absolute -= index_current_abs
         if rev_count_left_absolute < 0:
             raise PositiveValueExpectedException()

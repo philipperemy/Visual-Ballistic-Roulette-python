@@ -62,7 +62,7 @@ class PredictorPhysicsConstantDeceleration(object):
         last_wheel_lap_time_in_front_of_ref = Helper.get_last_time_wheel_is_in_front_of_ref(wheel_cum_sum_times,
                                                                                             last_time_ball_passes_in_front_of_ref)
 
-        log('Reference time of prediction = {} s'.format(last_time_ball_passes_in_front_of_ref), debug)
+        log('reference time of prediction = {} s'.format(last_time_ball_passes_in_front_of_ref), debug)
         ball_diff_times = Helper.compute_diff(ball_cum_sum_times)
         wheel_diff_times = Helper.compute_diff(wheel_cum_sum_times)
         ball_loop_count = len(ball_diff_times)
@@ -83,13 +83,14 @@ class PredictorPhysicsConstantDeceleration(object):
         log('estimated_time_left = {}'.format(estimated_time_left))
         log('________________________________')
 
+        # the speed values are always taken at the same diamond.
         diamond = HelperConstantDeceleration.detect_diamonds(number_of_revolutions_left_ball)
         log('diamond to be hit = {}'.format(diamond))
 
         if diamond == Constants.DiamondType.BLOCKER:
-            expected_bouncing_shift = 6
+            expected_bouncing_shift = Constants.EXPECTED_BOUNCING_SHIFT_BLOCKER_DIAMOND
         else:
-            expected_bouncing_shift = 16
+            expected_bouncing_shift = Constants.EXPECTED_BOUNCING_SHIFT_FORWARD_DIAMOND
 
         shift_ball_cutoff = (number_of_revolutions_left_ball % 1) * len(Wheel.NUMBERS)
         time_at_cutoff_ball = last_time_ball_passes_in_front_of_ref + estimated_time_left

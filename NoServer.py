@@ -79,8 +79,7 @@ def function_to_minimize(x):
                 # print(np.mean(np.array(dists)))
 
     loss = np.mean(np.array(dists_all))
-    print('cs = {}, dsp = {}, wd = {}, cd = {}, loss = {}, len = {}'.format(Constants.CUTOFF_SPEED,
-                                                                            Constants.DEFAULT_SHIFT_PHASE,
+    print('cs = {}, wd = {}, cd = {}, loss = {}, len = {}'.format(Constants.CUTOFF_SPEED,
                                                                             Constants.WHEEL_DIAMETER,
                                                                             Constants.CASE_DIAMETER,
                                                                             loss,

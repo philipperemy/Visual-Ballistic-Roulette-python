@@ -6,9 +6,18 @@ PI = 3.14159265359
 
 
 class Constants(object):
-    # to change.
-    WHEEL_DIAMETER = 0.5
-    CASE_DIAMETER = 0.7
+    # constants to optimise.
+    EXPECTED_BOUNCING_SHIFT_FORWARD_DIAMOND = 16
+    EXPECTED_BOUNCING_SHIFT_BLOCKER_DIAMOND = 6
+
+    # 0 means not used.
+    MOVE_TO_NEXT_DIAMOND = 0  # due to the intrisic speed. might change something. to be removed maybe later.
+
+    WHEEL_DIAMETER = 0.5  # meters
+    CASE_DIAMETER = 0.7  # meters
+    CUTOFF_SPEED = 1.00  # m/s
+
+    # end of constants to be optimised.
 
     @staticmethod
     def get_wheel_circumference():
@@ -41,7 +50,3 @@ class Constants(object):
     DEFAULT_WHEEL_WAY = Wheel.WheelWay.ANTICLOCKWISE
     DATABASE_NAME = 'roulette-experiment.db'
     SECONDS_NEEDED_TO_PLACE_BETS = 0
-
-    #  Physics
-    CUTOFF_SPEED = 1.00
-    DEFAULT_SHIFT_PHASE = 37

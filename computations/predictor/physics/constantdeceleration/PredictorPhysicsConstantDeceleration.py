@@ -84,7 +84,7 @@ class PredictorPhysicsConstantDeceleration(object):
         log('________________________________')
 
         diamond = HelperConstantDeceleration.detect_diamonds(number_of_revolutions_left_ball)
-        log('Diamond to be hit = {}'.format(diamond))
+        log('diamond to be hit = {}'.format(diamond))
 
         if diamond == Constants.DiamondType.BLOCKER:
             expected_bouncing_shift = 6

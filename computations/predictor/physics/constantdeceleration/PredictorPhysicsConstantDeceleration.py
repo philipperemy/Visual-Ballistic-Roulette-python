@@ -55,7 +55,7 @@ class PredictorPhysicsConstantDeceleration(object):
 
     @staticmethod
     def predict(ball_cum_sum_times, wheel_cum_sum_times, debug):
-        cutoff_speed = Constants.DIFF_TIMES
+        cutoff_speed = Constants.CUTOFF_SPEED
         speeds_mean = PredictorPhysicsConstantDeceleration.MEAN_SPEED_PER_REVOLUTION
 
         last_time_ball_passes_in_front_of_ref = ball_cum_sum_times[-1]

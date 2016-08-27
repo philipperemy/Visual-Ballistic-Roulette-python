@@ -7,8 +7,9 @@ PI = 3.14159265359
 
 class Constants(object):
 
-    WHEEL_DIAMETER = 1
-    CASE_DIAMETER = 1.0
+    # to change.
+    WHEEL_DIAMETER = 0.5
+    CASE_DIAMETER = 0.7
 
     @staticmethod
     def get_wheel_circumference():
@@ -35,5 +36,5 @@ class Constants(object):
     SECONDS_NEEDED_TO_PLACE_BETS = 0
 
     #  Physics
-    DIFF_TIMES = 2.42 - 0.05
+    CUTOFF_SPEED = 1.00
     DEFAULT_SHIFT_PHASE = 37

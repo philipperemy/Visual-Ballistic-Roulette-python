@@ -41,7 +41,7 @@ class Helper(object):
     #  m/s
     @staticmethod
     def get_ball_speed(t1, t2=0):
-        return Constants.get_ball_circumference() / abs(t2 - t1)
+        return Constants.get_ball_track_circumference() / abs(t2 - t1)
 
     #  m/s
     @staticmethod
@@ -50,7 +50,7 @@ class Helper(object):
 
     @staticmethod
     def get_time_for_one_ball_loop(ball_speed):
-        return Constants.get_ball_circumference() / ball_speed
+        return Constants.get_ball_track_circumference() / ball_speed
 
     #  Could interpolate with ML stuffs.
     @staticmethod

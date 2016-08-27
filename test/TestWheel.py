@@ -17,7 +17,7 @@ class TestWheel(unittest.TestCase):
 
     def test_helper_speed(self):
         #  In meter/second
-        self.assertEqual(Constants.get_ball_circumference(), Helper.get_ball_speed(0, 1), 0.01)
+        self.assertEqual(Constants.get_ball_track_circumference(), Helper.get_ball_speed(0, 1), 0.01)
         self.assertEqual(Constants.get_wheel_circumference(), Helper.get_wheel_speed(0, 1), 0.01)
 
     def test_helper_strategy_2(self):

@@ -6,7 +6,6 @@ PI = 3.14159265359
 
 
 class Constants(object):
-
     # to change.
     WHEEL_DIAMETER = 0.5
     CASE_DIAMETER = 0.7
@@ -16,8 +15,16 @@ class Constants(object):
         return Constants.WHEEL_DIAMETER * PI
 
     @staticmethod
-    def get_ball_circumference():
+    def get_ball_track_circumference():
         return Constants.CASE_DIAMETER * PI
+
+    class DiamondType:
+        def __init__(self):
+            pass
+
+        BLOCKER = 'BLOCKER'
+        FORWARD = 'FORWARD'
+        NONE = 'NONE'
 
     class Type:
         def __init__(self):

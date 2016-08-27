@@ -12,18 +12,20 @@ def add_all_folders_to_python_path():
 
 add_all_folders_to_python_path()
 
-from test.OutcomeStatisticsTest import OutcomeStatisticsTest
-from test.RegressionTest import RegressionTest
+from test.TestOutcomeStatistics import TestOutcomeStatistics
+from test.TestRegression import TestRegression
 from test.TestWheel import TestWheel
+from test.TestTimeSeriesMerger import TestTimeSeriesMerger
 
 from test.TestHelper import TestHelper
 
 
 def test_list():
     return [TestWheel,
-            RegressionTest,
+            TestRegression,
             TestHelper,
-            OutcomeStatisticsTest]
+            TestOutcomeStatistics,
+            TestTimeSeriesMerger]
 
 
 def run_test():

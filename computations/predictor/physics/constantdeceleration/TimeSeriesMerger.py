@@ -39,24 +39,14 @@ class TimeSeriesMerger(object):
 
     @staticmethod
     def find_index(time_series1, time_series2):
+        """INPUT1 time_series1 = [1, 2, 3, 4]
+           INPUT2 time_series2 = [0, 0, 0, 0, 1, 2, 3, 3, 0, 0, 0, 0]
+           OUTPUT fit_time_series_1 = [0, 0, 0, 0, 1, 2, 3, 4, 0, 0, 0, 0], index = 4
+        """
         N = len(time_series2)
         time_series = (N - len(time_series1)) * [0] + list(time_series1)
         losses = np.zeros(N)
         for i in range(N):
             losses[i] = TimeSeriesMerger.compute_loss(np.roll(time_series, -i), [time_series2])
-        return np.roll(time_series, -losses.argmin())
-
-
-if __name__ == '__main__':
-    lts = [[1, 20, 30, 4], [20, 30, 4], [30, 4], [20, 30]]
-    print(lts)
-    merged_lts = TimeSeriesMerger.optimal_roll(lts)
-    print(merged_lts)
-    print(np.mean(merged_lts, axis=0))
-
-    l1 = [1, 2, 3, 4]
-    l2 = [0, 0, 0, 0, 1, 2, 3, 3, 0, 0, 0, 0]
-
-    a = TimeSeriesMerger.find_index(l1, l2)
-    print(a)
-    print(np.where(a > 0)[0][0])
+        time_series_fit = np.roll(time_series, -losses.argmin())
+        return time_series_fit, np.where(time_series_fit > 0)[0][0]

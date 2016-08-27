@@ -3,7 +3,7 @@ import unittest
 from computations.utils.Helper import *
 
 
-class RegressionTest(unittest.TestCase):
+class TestRegression(unittest.TestCase):
     def test_regression(self):
         x = np.array([1, 3, 4])
         y = np.array([1, 3, 4])

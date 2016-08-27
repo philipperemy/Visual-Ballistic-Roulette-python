@@ -86,7 +86,7 @@ class PredictorPhysicsConstantDeceleration(object):
         diamond = HelperConstantDeceleration.detect_diamonds(number_of_revolutions_left_ball)
         log('Diamond to be hit = {}'.format(diamond))
 
-        if diamond == 'BLOCKER':
+        if diamond == Constants.DiamondType.BLOCKER:
             expected_bouncing_shift = 6
         else:
             expected_bouncing_shift = 16
@@ -108,7 +108,7 @@ class PredictorPhysicsConstantDeceleration(object):
 
         shift_to_add = shift_ball_cutoff + shift_between_initial_time_and_cutoff
         predicted_number_cutoff = Wheel.get_number_with_phase(initial_phase, shift_to_add, Constants.DEFAULT_WHEEL_WAY)
-        log("Number of pockets (computed from angle) = {}".format(shift_between_initial_time_and_cutoff), debug)
+        log("shift_between_initial_time_and_cutoff = {}".format(shift_between_initial_time_and_cutoff), debug)
         log("predicted_number_cutoff is = {}".format(predicted_number_cutoff), debug)
 
         log("expected_bouncing_shift = {}".format(expected_bouncing_shift), debug)

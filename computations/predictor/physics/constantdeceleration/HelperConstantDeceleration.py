@@ -100,8 +100,8 @@ class HelperConstantDeceleration(object):
     @staticmethod
     def compute_model_2(diff_times, mean_speeds):
         speeds = np.apply_along_axis(func1d=Helper.get_ball_speed, axis=0, arr=diff_times)
-        new_speeds = TimeSeriesMerger.find_index(speeds, mean_speeds)
-        return np.where(new_speeds > 0)[0][0]
+        new_speeds, index_of_rev_start_abs = TimeSeriesMerger.find_index(speeds, mean_speeds)
+        return index_of_rev_start_abs
 
     @staticmethod
     def detect_diamonds(distance_left):
@@ -109,7 +109,7 @@ class HelperConstantDeceleration(object):
         Ball is going anti-clockwise"""
         res_distance_left = distance_left % 1
         diamonds = np.cumsum(np.ones(8) * 0.125)
-        diamond_types = ['FORWARD', 'BLOCKER'] * 4
+        diamond_types = [Constants.DiamondType.FORWARD, Constants.DiamondType.BLOCKER] * 4
         distance_from_diamonds = np.array(diamonds - res_distance_left) ** 2
         index = np.argmin(distance_from_diamonds) + 1  # + 1 is for the intrinsic speed. might be a hyperparameter.
         if index == len(diamond_types):

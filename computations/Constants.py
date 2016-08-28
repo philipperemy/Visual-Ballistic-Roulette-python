@@ -11,7 +11,7 @@ class Constants(object):
     EXPECTED_BOUNCING_SHIFT_BLOCKER_DIAMOND = 6
 
     # 0 means not used.
-    MOVE_TO_NEXT_DIAMOND = 0  # due to the intrisic speed. might change something. to be removed maybe later.
+    MOVE_TO_NEXT_DIAMOND = 0  # due to the intrinsic speed. might change something. to be removed maybe later.
 
     WHEEL_DIAMETER = 0.5  # meters
     CASE_DIAMETER = 0.7  # meters

@@ -79,3 +79,7 @@ class Helper(object):
         clf = linear_model.LinearRegression()
         clf.fit(x_values.reshape(-1, 1), y_values.reshape(-1, 1))
         return clf
+
+    @staticmethod
+    def shuffle(list_of_time_series):
+        return np.random.shuffle(list_of_time_series)

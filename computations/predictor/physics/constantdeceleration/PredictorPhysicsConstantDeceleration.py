@@ -7,6 +7,8 @@ from utils.Logging import *
 class PredictorPhysicsConstantDeceleration(object):
     FIXED_SLOPE = None
     MEAN_SPEED_PER_REVOLUTION = None
+    BALL_SPEEDS_LIST = None
+    TIME_LEFT = None
 
     @staticmethod
     def load_cache(database):
@@ -35,6 +37,8 @@ class PredictorPhysicsConstantDeceleration(object):
         # plt.plot(mean_speed_per_revolution)
         PredictorPhysicsConstantDeceleration.FIXED_SLOPE = mean_slopes
         PredictorPhysicsConstantDeceleration.MEAN_SPEED_PER_REVOLUTION = mean_speed_per_revolution
+        PredictorPhysicsConstantDeceleration.BALL_SPEEDS_LIST = bs_list
+        PredictorPhysicsConstantDeceleration.TIME_LEFT = None
 
     @staticmethod
     def predict_most_probable_number(ball_cum_sum_times, wheel_cum_sum_times, debug=False):
@@ -61,7 +65,6 @@ class PredictorPhysicsConstantDeceleration(object):
         last_time_ball_passes_in_front_of_ref = ball_cum_sum_times[-1]
         last_wheel_lap_time_in_front_of_ref = Helper.get_last_time_wheel_is_in_front_of_ref(wheel_cum_sum_times,
                                                                                             last_time_ball_passes_in_front_of_ref)
-
         log('reference time of prediction = {} s'.format(last_time_ball_passes_in_front_of_ref), debug)
         ball_diff_times = Helper.compute_diff(ball_cum_sum_times)
         wheel_diff_times = Helper.compute_diff(wheel_cum_sum_times)
@@ -69,6 +72,11 @@ class PredictorPhysicsConstantDeceleration(object):
 
         # check all indices
         index_of_rev_start = HelperConstantDeceleration.compute_model_2(ball_diff_times, speeds_mean)
+
+        matched_game_indices = TimeSeriesMerger.find_nearest_neighbors(ball_diff_times,
+                                                                       PredictorPhysicsConstantDeceleration.BALL_SPEEDS_LIST,
+                                                                       index_of_rev_start,
+                                                                       neighbors_count=3)
 
         # if we have [0, 0, 1, 2, 3, 0, 0], index_of_rev_start = 2, index_current_abs = 2 + 3 - 1 = 4
         index_of_last_known_speed = ball_loop_count + index_of_rev_start - 1

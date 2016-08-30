@@ -69,7 +69,9 @@ class TimeSeriesMerger(object):
 
     @staticmethod
     def find_nearest_neighbors(time_series1, list_of_time_series, index_of_start, neighbors_count):
-        losses = (np.array(time_series1) - np.array(list_of_time_series)[:, index_of_start:]) ** 2
+        max_len = len(time_series1)
+        losses = np.sum(np.square(time_series1 - list_of_time_series[:, index_of_start:index_of_start + max_len]),
+                        axis=1)
         matched_game_indices = np.argsort(losses)[:neighbors_count]
         # np.array(list_of_time_series)[matched_game_indices, index_of_start:]
         return matched_game_indices

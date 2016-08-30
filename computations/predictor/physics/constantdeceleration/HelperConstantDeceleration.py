@@ -98,8 +98,7 @@ class HelperConstantDeceleration(object):
             return Helper.perform_regression(x, slope * x + intercept)  # trick
 
     @staticmethod
-    def compute_model_2(diff_times, mean_speeds):
-        speeds = np.apply_along_axis(func1d=Helper.get_ball_speed, axis=0, arr=diff_times)
+    def compute_model_2(speeds, mean_speeds):
         new_speeds, index_of_rev_start_abs = TimeSeriesMerger.find_index(speeds, mean_speeds)
         return index_of_rev_start_abs
 

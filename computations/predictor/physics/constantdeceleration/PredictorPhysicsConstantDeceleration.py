@@ -5,40 +5,29 @@ from utils.Logging import *
 
 
 class PredictorPhysicsConstantDeceleration(object):
-    FIXED_SLOPE = None
     MEAN_SPEED_PER_REVOLUTION = None
     BALL_SPEEDS_LIST = None
-    TIME_LEFT = None
+    TIME_LIST = None
 
     @staticmethod
     def load_cache(database):
-        slopes = []
+        """
+        New convention is that the last ball lap times measure is done when the ball enters the diamonds ring.
+        """
         bs_list = list()
+        ts_list = list()
         for session_id in database.get_session_ids():
             ball_cum_sum_times = database.select_ball_lap_times(session_id)
             if len(ball_cum_sum_times) >= Constants.MIN_NUMBER_OF_BALL_TIMES_BEFORE_PREDICTION:
                 ball_cum_sum_times = Helper.convert_to_seconds(ball_cum_sum_times)
                 ball_diff_times = Helper.compute_diff(ball_cum_sum_times)
-
-                regress = ball_diff_times[-3:]  # to change. the end seems linear.
-                ball_model = HelperConstantDeceleration.compute_model(regress)
-                slopes.append(ball_model.coef_[0, 0])
-
-                # import matplotlib.pyplot as plt
-                # plt.plot(ball_diff_times)
-                # plt.show()
-
                 bs_list.append(np.apply_along_axis(func1d=Helper.get_ball_speed, axis=0, arr=ball_diff_times))
-        log('Slopes = {}'.format(Helper.round_digits(slopes)))
-        mean_slopes = np.mean(slopes)
-        log('Mean(Slopes) = {}'.format(mean_slopes))
+                ts_list.append(ball_diff_times)
 
         mean_speed_per_revolution = np.nanmean(TimeSeriesMerger.merge(bs_list), axis=0)
-        # plt.plot(mean_speed_per_revolution)
-        PredictorPhysicsConstantDeceleration.FIXED_SLOPE = mean_slopes
         PredictorPhysicsConstantDeceleration.MEAN_SPEED_PER_REVOLUTION = mean_speed_per_revolution
-        PredictorPhysicsConstantDeceleration.BALL_SPEEDS_LIST = bs_list
-        PredictorPhysicsConstantDeceleration.TIME_LEFT = None
+        PredictorPhysicsConstantDeceleration.BALL_SPEEDS_LIST = np.array(bs_list)
+        PredictorPhysicsConstantDeceleration.TIME_LIST = np.array(ts_list)
 
     @staticmethod
     def predict_most_probable_number(ball_cum_sum_times, wheel_cum_sum_times, debug=False):
@@ -59,8 +48,9 @@ class PredictorPhysicsConstantDeceleration(object):
 
     @staticmethod
     def predict(ball_cum_sum_times, wheel_cum_sum_times, debug):
-        cutoff_speed = Constants.CUTOFF_SPEED
         speeds_mean = PredictorPhysicsConstantDeceleration.MEAN_SPEED_PER_REVOLUTION
+        bs_list = PredictorPhysicsConstantDeceleration.BALL_SPEEDS_LIST
+        ts_list = PredictorPhysicsConstantDeceleration.TIME_LIST
 
         last_time_ball_passes_in_front_of_ref = ball_cum_sum_times[-1]
         last_wheel_lap_time_in_front_of_ref = Helper.get_last_time_wheel_is_in_front_of_ref(wheel_cum_sum_times,
@@ -70,23 +60,26 @@ class PredictorPhysicsConstantDeceleration(object):
         wheel_diff_times = Helper.compute_diff(wheel_cum_sum_times)
         ball_loop_count = len(ball_diff_times)
 
+        speeds = np.apply_along_axis(func1d=Helper.get_ball_speed, axis=0, arr=ball_diff_times)
         # check all indices
-        index_of_rev_start = HelperConstantDeceleration.compute_model_2(ball_diff_times, speeds_mean)
+        index_of_rev_start = HelperConstantDeceleration.compute_model_2(speeds, speeds_mean)
+        index_of_last_known_speed = ball_loop_count + index_of_rev_start - 1
 
-        matched_game_indices = TimeSeriesMerger.find_nearest_neighbors(ball_diff_times,
-                                                                       PredictorPhysicsConstantDeceleration.BALL_SPEEDS_LIST,
-                                                                       index_of_rev_start,
+        matched_game_indices = TimeSeriesMerger.find_nearest_neighbors(speeds,
+                                                                       bs_list,
+                                                                       index_of_last_known_speed,
                                                                        neighbors_count=3)
 
-        # if we have [0, 0, 1, 2, 3, 0, 0], index_of_rev_start = 2, index_current_abs = 2 + 3 - 1 = 4
-        index_of_last_known_speed = ball_loop_count + index_of_rev_start - 1
-        number_of_revolutions_left_ball = HelperConstantDeceleration.estimate_revolution_count_left_2(speeds_mean,
-                                                                                                      index_of_last_known_speed,
-                                                                                                      cutoff_speed)
-        estimated_time_left = HelperConstantDeceleration.estimate_time_2(speeds_mean,
-                                                                         index_of_last_known_speed,
-                                                                         number_of_revolutions_left_ball)
+        estimated_time_left = np.mean(np.sum(ts_list[matched_game_indices, (index_of_last_known_speed + 1):], axis=1))
 
+        # very simple way to calculate it. Might be more complex.
+        decreasing_factor = np.mean(np.array((bs_list[matched_game_indices] / np.hstack(
+            [bs_list[matched_game_indices, 1:2] * 0 + 1, bs_list[matched_game_indices, :-1]]))[:, 1:]))
+
+        # if we have [0, 0, 1, 2, 3, 0, 0], index_of_rev_start = 2, index_current_abs = 2 + 3 - 1 = 4
+        qty_1 = bs_list[matched_game_indices, (index_of_last_known_speed + 1):].shape[1] - 1
+        qty_2 = (np.mean(bs_list[matched_game_indices, -1] / bs_list[matched_game_indices, -2])) / decreasing_factor
+        number_of_revolutions_left_ball = qty_1 + qty_2
         log('number_of_revolutions_left_ball = {}'.format(number_of_revolutions_left_ball))
         log('estimated_time_left = {}'.format(estimated_time_left))
         log('________________________________')

@@ -7,68 +7,61 @@ from utils.Logging import *
 class PredictorPhysics(object):
     MEAN_SPEED_PER_REVOLUTION = None
     BALL_SPEEDS_LIST = None
-    TIME_LIST = None
+    LAP_TIMES_ALL_GAMES = None
 
     @staticmethod
     def compute_inverse_for_games(ts_list):
         bs_list = []
-        for ball_diff_times in ts_list:
-            bs_list.append(np.apply_along_axis(func1d=Helper.get_inverse, axis=0, arr=ball_diff_times))
-        mean_speed_per_revolution = np.nanmean(TimeSeriesMerger.merge(bs_list), axis=0)
-        return np.array(bs_list), mean_speed_per_revolution
+        for ball_lap_times in ts_list:
+            bs_list.append(np.apply_along_axis(func1d=Helper.get_inverse, axis=0, arr=ball_lap_times))
+        mean_inverse_per_revolution = np.nanmean(TimeSeriesMerger.merge(bs_list), axis=0)
+        return np.array(bs_list), mean_inverse_per_revolution
 
     @staticmethod
     def load_cache(database):
         """
         New convention is that the last ball lap times measure is done when the ball enters the diamonds ring.
         """
-        bs_list = list()
-        ts_list = list()
+        lap_times_all_games = list()
         for session_id in database.get_session_ids():
-            ball_cum_sum_times = database.select_ball_lap_times(session_id)
-            if len(ball_cum_sum_times) >= Constants.MIN_NUMBER_OF_BALL_TIMES_BEFORE_PREDICTION:
-                ball_cum_sum_times = Helper.convert_to_seconds(ball_cum_sum_times)
-                ball_diff_times = Helper.compute_diff(ball_cum_sum_times)
-                bs_list.append(np.apply_along_axis(func1d=Helper.get_inverse, axis=0, arr=ball_diff_times))
-                ts_list.append(ball_diff_times)
-
-        mean_speed_per_revolution = np.nanmean(TimeSeriesMerger.merge(bs_list), axis=0)
-        PredictorPhysics.MEAN_SPEED_PER_REVOLUTION = mean_speed_per_revolution
-        PredictorPhysics.BALL_SPEEDS_LIST = np.array(bs_list)
-        PredictorPhysics.TIME_LIST = np.array(ts_list)
+            ball_recorded_times = database.select_ball_lap_times(session_id)
+            if len(ball_recorded_times) >= Constants.MIN_NUMBER_OF_BALL_TIMES_BEFORE_PREDICTION:
+                ball_lap_times = Helper.compute_diff(Helper.convert_to_seconds(ball_recorded_times))
+                lap_times_all_games.append(ball_lap_times)
+        PredictorPhysics.LAP_TIMES_ALL_GAMES = np.array(lap_times_all_games)
 
     @staticmethod
-    def predict_most_probable_number(ball_cum_sum_times, wheel_cum_sum_times, debug=False):
+    def predict_most_probable_number(ball_recorded_times, wheel_recorded_times, debug=False):
 
-        if len(wheel_cum_sum_times) < Constants.MIN_NUMBER_OF_WHEEL_TIMES_BEFORE_PREDICTION:
+        if len(wheel_recorded_times) < Constants.MIN_NUMBER_OF_WHEEL_TIMES_BEFORE_PREDICTION:
             raise SessionNotReadyException()
 
-        if len(ball_cum_sum_times) < Constants.MIN_NUMBER_OF_BALL_TIMES_BEFORE_PREDICTION:
+        if len(ball_recorded_times) < Constants.MIN_NUMBER_OF_BALL_TIMES_BEFORE_PREDICTION:
             raise SessionNotReadyException()
 
-        ball_cum_sum_times = Helper.convert_to_seconds(ball_cum_sum_times)
-        wheel_cum_sum_times = Helper.convert_to_seconds(wheel_cum_sum_times)
+        ball_recorded_times = Helper.convert_to_seconds(ball_recorded_times)
+        wheel_recorded_times = Helper.convert_to_seconds(wheel_recorded_times)
 
-        most_probable_number = PredictorPhysics.predict(ball_cum_sum_times,
-                                                        wheel_cum_sum_times,
+        most_probable_number = PredictorPhysics.predict(ball_recorded_times,
+                                                        wheel_recorded_times,
                                                         debug)
         return most_probable_number
 
     @staticmethod
-    def predict(ball_cum_sum_times, wheel_cum_sum_times, debug):
-        ts_list = PredictorPhysics.TIME_LIST
+    def predict(ball_recorded_times, wheel_recorded_times, debug):
+        ts_list = PredictorPhysics.LAP_TIMES_ALL_GAMES
         inverse_ts_list, inverse_ts_mean = PredictorPhysics.compute_inverse_for_games(ts_list)
 
-        last_time_ball_passes_in_front_of_ref = ball_cum_sum_times[-1]
-        last_wheel_lap_time_in_front_of_ref = Helper.get_last_time_wheel_is_in_front_of_ref(wheel_cum_sum_times,
+        last_time_ball_passes_in_front_of_ref = ball_recorded_times[-1]
+        last_wheel_lap_time_in_front_of_ref = Helper.get_last_time_wheel_is_in_front_of_ref(wheel_recorded_times,
                                                                                             last_time_ball_passes_in_front_of_ref)
         log('reference time of prediction = {} s'.format(last_time_ball_passes_in_front_of_ref), debug)
-        ball_diff_times = Helper.compute_diff(ball_cum_sum_times)
-        wheel_diff_times = Helper.compute_diff(wheel_cum_sum_times)
-        ball_loop_count = len(ball_diff_times)
+        ball_lap_times = Helper.compute_diff(ball_recorded_times)
+        wheel_lap_times = Helper.compute_diff(wheel_recorded_times)
+        ball_loop_count = len(ball_lap_times)
 
         # can probably match with the lap times. We de-couple the hyper parameters.
-        speeds = np.apply_along_axis(func1d=Helper.get_inverse, axis=0, arr=ball_diff_times)
+        speeds = np.apply_along_axis(func1d=Helper.get_inverse, axis=0, arr=ball_lap_times)
         # check all indices
         index_of_rev_start = Helper.find_abs_start_index(speeds, inverse_ts_mean)
         index_of_last_known_speed = ball_loop_count + index_of_rev_start - 1
@@ -108,7 +101,7 @@ class PredictorPhysics(object):
         if time_at_cutoff_ball < last_time_ball_passes_in_front_of_ref + Constants.SECONDS_NEEDED_TO_PLACE_BETS:
             raise PositiveValueExpectedException()
 
-        wheel_last_revolution_time = wheel_diff_times[-1]
+        wheel_last_revolution_time = wheel_lap_times[-1]
         initial_phase = Phase.find_phase_number_between_ball_and_wheel(last_time_ball_passes_in_front_of_ref,
                                                                        last_wheel_lap_time_in_front_of_ref,
                                                                        wheel_last_revolution_time,

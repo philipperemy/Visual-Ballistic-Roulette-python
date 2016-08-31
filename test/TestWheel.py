@@ -10,10 +10,10 @@ class TestWheel(unittest.TestCase):
         self.assertEqual(2, Wheel.find_index_of_number(15))
         self.assertListEqual([26, 0, 32], Wheel.get_nearby_numbers(0, 1))
         self.assertListEqual([2, 25, 17, 34, 6], Wheel.get_nearby_numbers(17, 2))
-        self.assertEqual(26, Wheel.get_number_with_phase(0, 1, Wheel.WheelWay.CLOCKWISE))
-        self.assertEqual(32, Wheel.get_number_with_phase(0, 1, Wheel.WheelWay.ANTICLOCKWISE))
-        self.assertEqual(2, Wheel.get_number_with_phase(17, 2, Wheel.WheelWay.CLOCKWISE))
-        self.assertEqual(6, Wheel.get_number_with_phase(17, 2, Wheel.WheelWay.ANTICLOCKWISE))
+        self.assertEqual(26, Wheel.get_number_with_shift(0, 1, Wheel.WheelWay.CLOCKWISE))
+        self.assertEqual(32, Wheel.get_number_with_shift(0, 1, Wheel.WheelWay.ANTICLOCKWISE))
+        self.assertEqual(2, Wheel.get_number_with_shift(17, 2, Wheel.WheelWay.CLOCKWISE))
+        self.assertEqual(6, Wheel.get_number_with_shift(17, 2, Wheel.WheelWay.ANTICLOCKWISE))
 
     def test_helper_speed(self):
         #  In meter/second

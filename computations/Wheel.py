@@ -26,12 +26,14 @@ class Wheel(object):
     def get_index(index):
         return index % len(Wheel.NUMBERS)
 
-    #
-    # 	 * Calculate the region around a specific number. Example is:
-    # 	 * region(reference_number=32, half_size = 2) = [26,0,32,15,19]
-    # 	 
     @staticmethod
     def get_nearby_numbers(reference_number, half_size):
+        """
+        region(reference_number=32, half_size = 2) = [26,0,32,15,19]
+        :param reference_number: number
+        :param half_size: half size of the region
+        :return: calculate the region around a specific number
+        """
         idx_number = Wheel.find_index_of_number(reference_number)
         first_idx_number = Wheel.get_index(idx_number - half_size)
         num_of_elements = half_size * 2 + 1
@@ -41,29 +43,24 @@ class Wheel(object):
             first_idx_number += 1
         return nearby_numbers
 
-    # 
-    # 	 * Translates a number on the wheel by a specific value.
-    # 	 * 
-    # 	 * @param reference_number
-    # 	 *            The number on the wheel
-    # 	 * @param phase_count
-    # 	 *            How many pockets should the reference number be translated
-    # 	 * @param way
-    # 	 *            Clockwise or Anticlockwise
-    # 	 * @return Example is translated(reference_number=32, phase_count=2,
-    # 	 *         way=Anticlockwise) = 19 ATTENTION: This is a bit tricky because
-    # 	 *         when the wheel turns anticlockwise, we scan the numbers forward
-    # 	 *         and not backwards as we would imagine. Sketch something if you
-    # 	 *         ain't sure.
-    # 	 
     @staticmethod
-    def get_number_with_phase(reference_number, phase_count, way):
-        phase_count = int(np.round(phase_count))
+    def get_number_with_shift(reference_number, shift, way):
+        """
+        Translates a number on the wheel by a specific value.
+        :param reference_number: The number on the wheel
+        :param shift: How many pockets should the reference number be translated
+        :param way: Clockwise or Anticlockwise
+        :return: Shifted number. ATTENTION: This is a bit tricky because
+        when the wheel turns anticlockwise, we scan the numbers forward
+        and not backwards as we would imagine. Sketch something if you
+        ain't sure.
+        """
+        shift = int(np.round(shift))
         idx_reference_number = Wheel.find_index_of_number(reference_number)
         if way == Wheel.WheelWay.CLOCKWISE:
-            new_idx = idx_reference_number - phase_count
+            new_idx = idx_reference_number - shift
         elif way == Wheel.WheelWay.ANTICLOCKWISE:
-            new_idx = idx_reference_number + phase_count
+            new_idx = idx_reference_number + shift
         else:
             raise CriticalException("Unknown type.")
         return Wheel.NUMBERS[Wheel.get_index(new_idx)]
@@ -72,19 +69,6 @@ class Wheel(object):
     @staticmethod
     def find_index_of_number(number):
         return Wheel.NUMBERS.index(number)
-
-    # Calculates the translation between (phase1, outcome1) and applies this
-    # translation to phase2. Example is: phase1 = 0, outcome1 = 32. phase2 =
-    # 19. translation(phase1, outcome1) = you add 1 forward. You take the
-    # number 19 and you add this translation. The result is 4.
-    @staticmethod
-    def predict_outcome_with_shift(phase1, outcome1, phase2):
-        idx_p1 = Wheel.find_index_of_number(phase1)
-        idx_o1 = Wheel.find_index_of_number(outcome1)
-        diff_idx_between_phase_and_outcome1 = Wheel.get_index(idx_o1 - idx_p1)
-        id_p2 = Wheel.find_index_of_number(phase2)
-        id_o2 = Wheel.get_index(id_p2 + diff_idx_between_phase_and_outcome1)
-        return Wheel.NUMBERS[id_o2]
 
     # Here max distance is 37/2. Opposite of the wheel. Calculate the shortest
     # distance between two numbers. Example: distance(0,32) = 1.

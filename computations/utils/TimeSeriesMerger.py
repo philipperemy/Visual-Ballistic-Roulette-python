@@ -1,5 +1,5 @@
 from Helper import *
-
+import numpy as np
 
 class TimeSeriesMerger(object):
     @staticmethod

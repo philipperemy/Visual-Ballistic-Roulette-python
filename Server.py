@@ -42,7 +42,7 @@ class Parameters(object):
 app = Flask(__name__)
 api = Api(app)
 
-da = DatabaseAccessor()
+da = DatabaseAccessor.get_instance()
 sm = SessionManager(da)
 
 

@@ -29,7 +29,7 @@ try:
 except OSError:
     pass
 
-da = DatabaseAccessor()
+da = DatabaseAccessor.get_instance()
 
 session_id = da.increment_and_get_session_id()
 

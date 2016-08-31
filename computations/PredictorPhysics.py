@@ -109,13 +109,13 @@ class PredictorPhysics(object):
             Wheel.NUMBERS)
 
         shift_to_add = shift_ball_cutoff + shift_between_initial_time_and_cutoff
-        predicted_number_cutoff = Wheel.get_number_with_phase(initial_phase, shift_to_add, Constants.DEFAULT_WHEEL_WAY)
+        predicted_number_cutoff = Wheel.get_number_with_shift(initial_phase, shift_to_add, Constants.DEFAULT_WHEEL_WAY)
         log("shift_between_initial_time_and_cutoff = {}".format(shift_between_initial_time_and_cutoff), debug)
         log("predicted_number_cutoff is = {}".format(predicted_number_cutoff), debug)
 
         log("expected_bouncing_shift = {}".format(expected_bouncing_shift), debug)
         shift_to_add += expected_bouncing_shift
-        predicted_number = Wheel.get_number_with_phase(initial_phase, shift_to_add, Constants.DEFAULT_WHEEL_WAY)
+        predicted_number = Wheel.get_number_with_shift(initial_phase, shift_to_add, Constants.DEFAULT_WHEEL_WAY)
         log("predicted_number is = {}".format(predicted_number), debug)
 
         # possibility to assess the error on:

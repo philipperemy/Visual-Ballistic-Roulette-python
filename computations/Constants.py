@@ -8,14 +8,6 @@ class Constants(object):
     NEAREST_NEIGHBORS_COUNT = 3
     MOVE_TO_NEXT_DIAMOND = 0  # due to the intrinsic speed. might change something. to be removed maybe later.
 
-    class DiamondType:
-        def __init__(self):
-            pass
-
-        BLOCKER = 'BLOCKER'
-        FORWARD = 'FORWARD'
-        NONE = 'NONE'
-
     class Type:
         def __init__(self):
             pass
@@ -23,8 +15,8 @@ class Constants(object):
         BALL = 'BALL'
         WHEEL = 'WHEEL'
 
-    MIN_NUMBER_OF_WHEEL_TIMES_BEFORE_PREDICTION = 2
-    MIN_NUMBER_OF_BALL_TIMES_BEFORE_PREDICTION = 3
+    MIN_WHEEL_COUNT_OF_RECORDED_TIMES = 2
+    MIN_BALL_COUNT_OF_RECORDED_TIMES = 3
     THRESHOLD_BEFORE_NEW_SESSION_IN_MS = 30 * 1000
 
     #  There is only one way we accept in the games. Never change this.

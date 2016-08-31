@@ -29,14 +29,14 @@ def current_time_millis():
 
 class Parameters(object):
     #  Request
-    TIME = "ts"
-    TYPE = "type"
+    TIME = 'ts'
+    TYPE = 'type'
 
     #  Response
-    SESSION_ID = "sessionid"
-    OUTCOME = "outcome"
-    TYPE_WHEEL = "wheel"
-    TYPE_BALL = "ball"
+    SESSION_ID = 'sessionid'
+    OUTCOME = 'outcome'
+    TYPE_WHEEL = 'wheel'
+    TYPE_BALL = 'ball'
 
 
 app = Flask(__name__)
@@ -44,6 +44,7 @@ api = Api(app)
 
 da = DatabaseAccessor.get_instance()
 sm = SessionManager(da)
+PredictorPhysics.load_cache(da)
 
 
 @app.after_request
@@ -73,7 +74,6 @@ class RequestRoulette(Resource):
                 raise Exception('Parameter type ({}) missing.'.format(Parameters.TYPE))
 
             session_id = sm.call_manager(query_time=current_time_millis())
-
             if object_type == Constants.Type.BALL:
                 da.insert_ball_lap_times(session_id, timestamp)
             elif object_type == Constants.Type.WHEEL:
@@ -96,9 +96,10 @@ class ResponseRoulette(Resource):
     @staticmethod
     def get():
         try:
+            start_time = current_time_millis()
             parser = reqparse.RequestParser()
             parser.add_argument(Parameters.SESSION_ID, type=str)
-            parser.add_argument('outcome', type=str)
+            parser.add_argument(Parameters.OUTCOME, type=str)
             args = parser.parse_args()
             session_id = args[Parameters.SESSION_ID]
             if session_id is None:
@@ -107,41 +108,34 @@ class ResponseRoulette(Resource):
             if session_id is None or session_id == '':
                 log('Problem occurred. Session id should not be empty.')
                 raise Exception()
-            outcome = args['outcome']
+            outcome = args[Parameters.OUTCOME]
             if outcome is not None and outcome != '':
+                # Insert number workflow
                 da.insert_outcome(session_id, outcome)
                 log('New outcome inserted. Session id = {}, outcome = {}'.format(session_id, outcome))
+                return {'status': 'success',
+                        'outcome': outcome,
+                        'session_id': session_id}
 
-            # Predict outcome workflow.
-            blt = da.select_ball_lap_times(session_id)
-            wlt = da.select_wheel_lap_times(session_id)
-            predicted_number = PredictorPhysics.predict_most_probable_number(blt,
-                                                                                                 wlt)
-            output = {'predicted_number': predicted_number,
-                      'status': 'success'}
+            # Predict number workflow.
+            ball_recorded_times = da.select_ball_recorded_times(session_id)
+            wheel_recorded_times = da.select_wheel_recorded_times(session_id)
+            predicted_number = PredictorPhysics.predict_most_probable_number(ball_recorded_times,
+                                                                             wheel_recorded_times)
             log('Predicted number = {}, session id = {}'.format(predicted_number, session_id))
-        except PositiveValueExpectedException:
-            msg = 'Positive value expected.'
-            log(msg)
-            output = {'error': msg,
-                      'status': 'failure'}
-        except SessionNotReadyException:
-            msg = 'Session not ready yet.'
-            log(msg)
-            output = {'error': msg,
-                      'status': 'failure'}
+            return {'status': 'success',
+                    'predicted_number': predicted_number,
+                    'latency_ms': current_time_millis() - start_time}
         except Exception as e:
             log(e)
-            output = {'error': str(e),
-                      'status': 'failure'}
-
-        return output
+            return {'status': 'failure',
+                    'error': str(e)}
 
 
 class HelloWorldRoulette(Resource):
     @staticmethod
     def get():
-        return 'Hello Roulette world.'
+        return 'Hello Roulette world. Hit /Request or /Response.'
 
 
 api.add_resource(RequestRoulette, '/Request', methods=['GET'])

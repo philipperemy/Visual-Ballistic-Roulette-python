@@ -2,7 +2,7 @@ from Phase import *
 from TimeSeriesMerger import *
 from utils.Exceptions import *
 from utils.Logging import *
-
+from Diamonds import *
 
 class PredictorPhysics(object):
     LAP_TIMES_ALL_GAMES = None
@@ -22,8 +22,8 @@ class PredictorPhysics(object):
         """
         lap_times_all_games = list()
         for session_id in database.get_session_ids():
-            ball_recorded_times = database.select_ball_lap_times(session_id)
-            if len(ball_recorded_times) >= Constants.MIN_NUMBER_OF_BALL_TIMES_BEFORE_PREDICTION:
+            ball_recorded_times = database.select_ball_recorded_times(session_id)
+            if len(ball_recorded_times) >= Constants.MIN_BALL_COUNT_OF_RECORDED_TIMES:
                 ball_lap_times = Helper.compute_diff(Helper.convert_to_seconds(ball_recorded_times))
                 lap_times_all_games.append(ball_lap_times)
         PredictorPhysics.LAP_TIMES_ALL_GAMES = np.array(lap_times_all_games)
@@ -31,10 +31,10 @@ class PredictorPhysics(object):
     @staticmethod
     def predict_most_probable_number(ball_recorded_times, wheel_recorded_times, debug=False):
 
-        if len(wheel_recorded_times) < Constants.MIN_NUMBER_OF_WHEEL_TIMES_BEFORE_PREDICTION:
+        if len(wheel_recorded_times) < Constants.MIN_WHEEL_COUNT_OF_RECORDED_TIMES:
             raise SessionNotReadyException()
 
-        if len(ball_recorded_times) < Constants.MIN_NUMBER_OF_BALL_TIMES_BEFORE_PREDICTION:
+        if len(ball_recorded_times) < Constants.MIN_BALL_COUNT_OF_RECORDED_TIMES:
             raise SessionNotReadyException()
 
         ball_recorded_times = Helper.convert_to_seconds(ball_recorded_times)
@@ -48,6 +48,10 @@ class PredictorPhysics(object):
     @staticmethod
     def predict(ball_recorded_times, wheel_recorded_times, debug):
         ts_list = PredictorPhysics.LAP_TIMES_ALL_GAMES
+
+        if ts_list is None:
+            raise CriticalException('Cache is not initialized. Call load_cache().')
+
         inverse_ts_list, inverse_ts_mean = PredictorPhysics.compute_inverse_for_games(ts_list)
 
         last_time_ball_passes_in_front_of_ref = ball_recorded_times[-1]
@@ -59,36 +63,43 @@ class PredictorPhysics(object):
         ball_loop_count = len(ball_lap_times)
 
         # can probably match with the lap times. We de-couple the hyper parameters.
-        speeds = np.apply_along_axis(func1d=Helper.get_inverse, axis=0, arr=ball_lap_times)
-        # check all indices
-        index_of_rev_start = Helper.find_abs_start_index(speeds, inverse_ts_mean)
-        index_of_last_known_speed = ball_loop_count + index_of_rev_start - 1
+        # maybe inverse is less sensitive to error measurements.
+        inverse_lap_times = np.apply_along_axis(func1d=Helper.get_inverse, axis=0, arr=ball_lap_times)
 
-        matched_game_indices = TimeSeriesMerger.find_nearest_neighbors(speeds,
+        # check all indices
+        index_of_rev_start = Helper.find_abs_start_index(inverse_lap_times, inverse_ts_mean)
+        index_of_last_recorded_time = ball_loop_count + index_of_rev_start - 1
+
+        matched_game_indices = TimeSeriesMerger.find_nearest_neighbors(inverse_lap_times,
                                                                        inverse_ts_list,
-                                                                       index_of_last_known_speed,
+                                                                       index_of_last_recorded_time,
                                                                        neighbors_count=Constants.NEAREST_NEIGHBORS_COUNT)
 
-        estimated_time_left = np.mean(np.sum(ts_list[matched_game_indices, (index_of_last_known_speed + 1):], axis=1))
+        estimated_time_left = np.mean(np.sum(ts_list[matched_game_indices, (index_of_last_recorded_time + 1):], axis=1))
 
         # TODO: very simple way to calculate it. Might be more complex.
         decreasing_factor = np.mean(np.array((inverse_ts_list[matched_game_indices] / np.hstack(
             [inverse_ts_list[matched_game_indices, 1:2] * 0 + 1, inverse_ts_list[matched_game_indices, :-1]]))[:, 1:]))
 
         # if we have [0, 0, 1, 2, 3, 0, 0], index_of_rev_start = 2, index_current_abs = 2 + 3 - 1 = 4
-        qty_1 = inverse_ts_list[matched_game_indices, (index_of_last_known_speed + 1):].shape[1] - 1
+        qty_1 = inverse_ts_list[matched_game_indices, (index_of_last_recorded_time + 1):].shape[1] - 1
         qty_2 = (np.mean(
             inverse_ts_list[matched_game_indices, -1] / inverse_ts_list[matched_game_indices, -2])) / decreasing_factor
         number_of_revolutions_left_ball = qty_1 + qty_2
+
+        if number_of_revolutions_left_ball <= 0:
+            error_msg = 'qty_1 = {}, qty_2 = {}.'.format(qty_1, qty_2)
+            raise PositiveValueExpectedException('number_of_revolutions_left_ball should be positive. ' + error_msg)
+
         log('number_of_revolutions_left_ball = {}'.format(number_of_revolutions_left_ball))
         log('estimated_time_left = {}'.format(estimated_time_left))
         log('________________________________')
 
-        # the speed values are always taken at the same diamond.
-        diamond = Helper.detect_diamonds(number_of_revolutions_left_ball)
+        # the time values are always taken at the same diamond.
+        diamond = Diamonds.detect_diamonds(number_of_revolutions_left_ball)
         log('diamond to be hit = {}'.format(diamond))
 
-        if diamond == Constants.DiamondType.BLOCKER:
+        if diamond == Diamonds.DiamondType.BLOCKER:
             expected_bouncing_shift = Constants.EXPECTED_BOUNCING_SHIFT_BLOCKER_DIAMOND
         else:
             expected_bouncing_shift = Constants.EXPECTED_BOUNCING_SHIFT_FORWARD_DIAMOND

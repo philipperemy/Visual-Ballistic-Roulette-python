@@ -5,8 +5,8 @@ from utils.Logging import *
 
 
 class DatabaseAccessor(object):
-    WHEEL_LAP_TIMES_TABLE_NAME = "wheel_lap_times"
-    BALL_LAP_TIMES_TABLE_NAME = "ball_lap_times"
+    WHEEL_LAP_TIMES_TABLE_NAME = 'wheel_lap_times'
+    BALL_LAP_TIMES_TABLE_NAME = 'ball_lap_times'
 
     __instance__ = None
 
@@ -60,13 +60,13 @@ class DatabaseAccessor(object):
         for row in self.connect.execute("SELECT ID FROM session ORDER BY id DESC LIMIT 1"):
             return row[0]
 
-    def select_ball_lap_times(self, session_id):
-        return self.select_lap_times(self.BALL_LAP_TIMES_TABLE_NAME, session_id)
+    def select_ball_recorded_times(self, session_id):
+        return self.select_recorded_times(self.BALL_LAP_TIMES_TABLE_NAME, session_id)
 
-    def select_wheel_lap_times(self, session_id):
-        return self.select_lap_times(self.WHEEL_LAP_TIMES_TABLE_NAME, session_id)
+    def select_wheel_recorded_times(self, session_id):
+        return self.select_recorded_times(self.WHEEL_LAP_TIMES_TABLE_NAME, session_id)
 
-    def select_lap_times(self, table_name, session_id):
+    def select_recorded_times(self, table_name, session_id):
         sql_query = "SELECT TIME FROM `" + table_name + "` WHERE SESSION_ID = " + str(session_id) + ";"
         result = []
         for row in self.connect.execute(sql_query):

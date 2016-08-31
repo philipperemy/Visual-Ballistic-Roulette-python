@@ -1,6 +1,6 @@
 import unittest
 
-from computations.predictor.Phase import *
+from Phase import *
 
 
 class TestWheel(unittest.TestCase):

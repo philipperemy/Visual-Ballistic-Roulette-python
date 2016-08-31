@@ -18,7 +18,7 @@ add_all_folders_to_python_path()
 
 from database.DatabaseAccessor import *
 from database.SessionManager import *
-from computations.predictor.physics.constantdeceleration.PredictorPhysicsConstantDeceleration import *
+from PredictorPhysics import *
 from computations.utils.Helper import *
 from utils.Logging import *
 
@@ -115,7 +115,7 @@ class ResponseRoulette(Resource):
             # Predict outcome workflow.
             blt = da.select_ball_lap_times(session_id)
             wlt = da.select_wheel_lap_times(session_id)
-            predicted_number = PredictorPhysicsConstantDeceleration.predict_most_probable_number(blt,
+            predicted_number = PredictorPhysics.predict_most_probable_number(blt,
                                                                                                  wlt)
             output = {'predicted_number': predicted_number,
                       'status': 'success'}

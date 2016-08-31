@@ -1,14 +1,11 @@
 import numpy as np
 from sklearn import linear_model
 
-from Constants import *
-from Exceptions import *
+from TimeSeriesMerger import *
+from computations.Constants import *
 
 
 class Helper(object):
-    @staticmethod
-    def round_digits(l):
-        return '[' + ', '.join(['%.4f' % item for item in l]) + ']'
 
     @staticmethod
     def convert_to_seconds(milliseconds):
@@ -31,41 +28,8 @@ class Helper(object):
         return np.diff(np.array(lap_times))
 
     @staticmethod
-    def normalize(cumsum_times, origin):
-        return np.array(cumsum_times) - origin
-
-    @staticmethod
-    def estimate_distance_constant_speed(t1, t2, speed):
-        return speed * (t2 - t1)
-
-    #  m/s
-    @staticmethod
-    def get_ball_speed(t1, t2=0):
-        return Constants.get_ball_track_circumference() / abs(t2 - t1)
-
-    #  m/s
-    @staticmethod
-    def get_wheel_speed(t1, t2=0):
-        return Constants.get_wheel_circumference() / abs(t2 - t1)
-
-    @staticmethod
-    def get_time_for_one_ball_loop(ball_speed):
-        return Constants.get_ball_track_circumference() / ball_speed
-
-    #  Could interpolate with ML stuffs.
-    @staticmethod
-    def get_time_for_one_wheel_loop(wheel_speed):
-        return Constants.get_wheel_circumference() / wheel_speed
-
-    #  m/s. T1 and T2
-    @staticmethod
-    def get_speed(t1, t2, i_type):
-        if i_type == Constants.Type.BALL:
-            return Helper.get_ball_speed(t1, t2)
-        elif i_type == Constants.Type.WHEEL:
-            return Helper.get_wheel_speed(t1, t2)
-        else:
-            raise CriticalException("Unknown type.")
+    def get_inverse(x):
+        return 1 / x
 
     # Example is list of size 160, L=80. We expect two lists of size 80.
     @staticmethod
@@ -81,5 +45,22 @@ class Helper(object):
         return clf
 
     @staticmethod
-    def shuffle(list_of_time_series):
-        return np.random.shuffle(list_of_time_series)
+    def find_abs_start_index(speeds, mean_speeds):
+        new_speeds, index_of_rev_start_abs = TimeSeriesMerger.find_index(speeds, mean_speeds)
+        return index_of_rev_start_abs
+
+    @staticmethod
+    def detect_diamonds(distance_left):
+        """beginning is assumed to be at the ref diamond. Ref diamond is FORWARD.
+        8 diamonds in total. We consider 9 here just to have the modulo to 1.
+        For example, if we have distance_left = 0.99, we consider it to be close to 1
+        => First diamond should be hit. And not the last one equal to 7/8 = 0.875
+        Ball is going anti-clockwise"""
+        res_distance_left = distance_left % 1
+        diamond_angles = np.cumsum(np.ones(9) * 1.0 / 8) - 1.0 / 8
+
+        # 5 is a big value to be sure to be inside the bounds of diamond_types[]
+        diamond_types = [Constants.DiamondType.FORWARD, Constants.DiamondType.BLOCKER] * 5
+        distance_from_diamonds = np.array(diamond_angles - res_distance_left) ** 2
+        index = np.argmin(distance_from_diamonds) + Constants.MOVE_TO_NEXT_DIAMOND
+        return diamond_types[index]

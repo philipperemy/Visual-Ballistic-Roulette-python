@@ -1,7 +1,7 @@
 import sys
 import time
 
-from computations.predictor.physics.constantdeceleration.PredictorPhysicsConstantDeceleration import *
+from computations.PredictorPhysics import *
 
 
 def add_all_folders_to_python_path():
@@ -78,7 +78,7 @@ for ws in WS_4:
 # we can do even easier. recreate the whole curve and find the xmin such that f(xmin) = times_cutoff.
 # then identify how long left with TS Merge.
 
-PredictorPhysicsConstantDeceleration.load_cache(da)
-# PredictorPhysicsConstantDeceleration.predict_most_probable_number(BS_2[:-1], WS_2, debug=True)
+PredictorPhysics.load_cache(da)
+# PredictorPhysics.predict_most_probable_number(BS_2[:-1], WS_2, debug=True)
 
-PredictorPhysicsConstantDeceleration.predict_most_probable_number(BS_4[:-1], WS_4, debug=True)
+PredictorPhysics.predict_most_probable_number(BS_4[:-1], WS_4, debug=True)

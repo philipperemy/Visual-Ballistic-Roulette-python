@@ -1,6 +1,6 @@
 import unittest
 
-from computations.predictor.OutcomeStatistics import *
+from OutcomeStatistics import *
 
 
 class TestOutcomeStatistics(unittest.TestCase):

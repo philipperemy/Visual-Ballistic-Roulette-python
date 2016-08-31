@@ -17,9 +17,9 @@ class TestHelper(unittest.TestCase):
         self.assertEqual(12.0,
                          Helper.get_last_time_wheel_is_in_front_of_ref(wheel_lap_times, ball_lap_time_in_front_of_ref))
         self.assertEqual(None,
-                     Helper.get_last_time_wheel_is_in_front_of_ref(wheel_lap_times, 9.0))
+                         Helper.get_last_time_wheel_is_in_front_of_ref(wheel_lap_times, 9.0))
 
     def test_compute_diff(self):
         #  In meter/second
-        cumsum_times = [10.0, 11.0, 12.0, 13.0, 15.0]
-        self.assertListEqual([1.0, 1.0, 1.0, 2.0], list(Helper.compute_diff(cumsum_times)))
+        cum_sum_times = [10.0, 11.0, 12.0, 13.0, 15.0]
+        self.assertListEqual([1.0, 1.0, 1.0, 2.0], list(Helper.compute_diff(cum_sum_times)))

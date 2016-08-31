@@ -1,6 +1,6 @@
-from computations.predictor.physics.constantdeceleration.PredictorPhysicsConstantDeceleration import *
+from computations.PredictorPhysics import *
 
 if __name__ == '__main__':
     blt = []
     wlt = []
-    n_predicted = PredictorPhysicsConstantDeceleration.predict_most_probable_number(blt, wlt, debug=False)
+    n_predicted = PredictorPhysics.predict_most_probable_number(blt, wlt, debug=False)

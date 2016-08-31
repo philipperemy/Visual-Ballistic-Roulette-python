@@ -1,6 +1,6 @@
 import unittest
 
-from computations.predictor.physics.constantdeceleration.TimeSeriesMerger import *
+from computations.utils.TimeSeriesMerger import *
 
 
 class TestTimeSeriesMerger(unittest.TestCase):

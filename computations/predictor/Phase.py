@@ -13,11 +13,11 @@ class Phase(object):
     # time_ofBall_inFront_ofMark.
     # 	 
     @staticmethod
-    def find_phase_number_between_ball_and_wheel(time_of_ball_in_front_of_mark, time_of_wheel_in_front_of_mark,
-                                                 last_wheel_speed,
+    def find_phase_number_between_ball_and_wheel(time_of_ball_in_front_of_mark,
+                                                 time_of_wheel_in_front_of_mark,
+                                                 wheel_revolution_time,
                                                  way):
         diff_time = np.abs(time_of_ball_in_front_of_mark - time_of_wheel_in_front_of_mark)
-        wheel_revolution_time = Helper.get_time_for_one_wheel_loop(last_wheel_speed)
         numbers_count = len(Wheel.NUMBERS)
         idx_phase = int((diff_time / wheel_revolution_time * numbers_count))
         idx_zero = Wheel.find_index_of_number(0)  # Should be always 0

@@ -60,6 +60,7 @@ class PredictorPhysicsConstantDeceleration(object):
         wheel_diff_times = Helper.compute_diff(wheel_cum_sum_times)
         ball_loop_count = len(ball_diff_times)
 
+        # can probably match with the lap times. We de-couple the hyper parameters.
         speeds = np.apply_along_axis(func1d=Helper.get_ball_speed, axis=0, arr=ball_diff_times)
         # check all indices
         index_of_rev_start = HelperConstantDeceleration.compute_model_2(speeds, speeds_mean)
@@ -99,13 +100,13 @@ class PredictorPhysicsConstantDeceleration(object):
         if time_at_cutoff_ball < last_time_ball_passes_in_front_of_ref + Constants.SECONDS_NEEDED_TO_PLACE_BETS:
             raise PositiveValueExpectedException()
 
-        constant_wheel_speed = Helper.get_wheel_speed(wheel_diff_times[-1])
+        wheel_last_revolution_time = wheel_diff_times[-1]
         initial_phase = Phase.find_phase_number_between_ball_and_wheel(last_time_ball_passes_in_front_of_ref,
                                                                        last_wheel_lap_time_in_front_of_ref,
-                                                                       constant_wheel_speed,
+                                                                       wheel_last_revolution_time,
                                                                        Constants.DEFAULT_WHEEL_WAY)
 
-        shift_between_initial_time_and_cutoff = ((estimated_time_left / wheel_diff_times[-1]) % 1) * len(
+        shift_between_initial_time_and_cutoff = ((estimated_time_left / wheel_last_revolution_time) % 1) * len(
             Wheel.NUMBERS)
 
         shift_to_add = shift_ball_cutoff + shift_between_initial_time_and_cutoff
@@ -127,4 +128,22 @@ class PredictorPhysicsConstantDeceleration(object):
         # - predicted_number_cutoff
         # - predicted_number (less important)
         # - diamond: FORWARD, BLOCKER, NO_DIAMOND (position of the diamond)
+
+        # HYPER PARAMETER RELATION WITH QUANTITIES
+        # - estimated_time_left (NOTHING) BALL SPEED IS NOT NEEDED.
+        # - number_of_revolutions_left_ball (NOTHING) BALL SPEED IS NOT NEEDED.
+        # - PHASE 2 - if both quantities are correct, we can estimate predicted_number_cutoff exactly (without any
+        # errors on the measurements).
+        # - initial_phase (NOTHING) WHEEL SPEED IS NOT NEEDED.
+        # - predicted_number_cutoff
+        # - predicted_number (less important)
+        # - diamond: FORWARD, BLOCKER, NO_DIAMOND (position of the diamond)
+
+        #     # constants to optimise.
+        #   EXPECTED_BOUNCING_SHIFT_FORWARD_DIAMOND = 16
+        #   EXPECTED_BOUNCING_SHIFT_BLOCKER_DIAMOND = 6
+        #   MOVE_TO_NEXT_DIAMOND = 0  # due to the intrinsic speed. might change something. to be removed maybe later.
+        #
+        # Important
+        # Actually we don't need BALL_SPEED, WHEEL_SPEED, CUTOFF_SPEED !
         return predicted_number

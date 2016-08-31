@@ -5,8 +5,6 @@ from utils.Logging import *
 
 
 class PredictorPhysics(object):
-    MEAN_SPEED_PER_REVOLUTION = None
-    BALL_SPEEDS_LIST = None
     LAP_TIMES_ALL_GAMES = None
 
     @staticmethod
@@ -73,7 +71,7 @@ class PredictorPhysics(object):
 
         estimated_time_left = np.mean(np.sum(ts_list[matched_game_indices, (index_of_last_known_speed + 1):], axis=1))
 
-        # very simple way to calculate it. Might be more complex.
+        # TODO: very simple way to calculate it. Might be more complex.
         decreasing_factor = np.mean(np.array((inverse_ts_list[matched_game_indices] / np.hstack(
             [inverse_ts_list[matched_game_indices, 1:2] * 0 + 1, inverse_ts_list[matched_game_indices, :-1]]))[:, 1:]))
 

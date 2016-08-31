@@ -12,10 +12,6 @@ class Helper(object):
         return np.array([1e-3 * x for x in milliseconds])
 
     @staticmethod
-    def print_val_or_infinity_symbol(value):
-        return "+oo" if value > 1e9 else str(value)
-
-    @staticmethod
     def get_last_time_wheel_is_in_front_of_ref(wheel_lap_times, ball_lap_time_in_front_of_ref):
         res = None
         for wheel_time_in_front_of_ref in wheel_lap_times:
@@ -52,7 +48,7 @@ class Helper(object):
     @staticmethod
     def detect_diamonds(distance_left):
         """beginning is assumed to be at the ref diamond. Ref diamond is FORWARD.
-        8 diamonds in total. We consider 9 here just to have the modulo to 1.
+        8 diamonds in total. We consider 9 here just to have the modulo to 1 (close the loop).
         For example, if we have distance_left = 0.99, we consider it to be close to 1
         => First diamond should be hit. And not the last one equal to 7/8 = 0.875
         Ball is going anti-clockwise"""

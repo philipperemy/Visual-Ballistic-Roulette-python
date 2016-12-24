@@ -1,5 +1,5 @@
 from Helper import *
-import numpy as np
+
 
 class TimeSeriesMerger(object):
     @staticmethod
@@ -79,4 +79,4 @@ class TimeSeriesMerger(object):
 
 if __name__ == '__main__':
     a = np.array([3, 2, 1, 1, 2, 0, 0, 4])
-    print a[np.argsort(a)[:2]]
+    print(a[np.argsort(a)[:2]])

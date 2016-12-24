@@ -17,6 +17,6 @@ class TestTimeSeriesMerger(unittest.TestCase):
 
         l1 = [1, 2, 3, 4]
         l2 = [0, 0, 0, 0, 1, 2, 3, 3, 0, 0, 0, 0]
-        a, b = TimeSeriesMerger.find_index(l1, l2)
-        self.assertListEqual(list(a), [0, 0, 0, 0, 1, 2, 3, 4, 0, 0, 0, 0])
-        self.assertEqual(b, 4)
+        a_, b_ = TimeSeriesMerger.find_index(l1, l2)
+        self.assertListEqual(list(a_), [0, 0, 0, 0, 1, 2, 3, 4, 0, 0, 0, 0])
+        self.assertEqual(b_, 4)

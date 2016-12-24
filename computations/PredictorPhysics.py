@@ -1,11 +1,11 @@
 import numpy as np
 
-from computations.utils.Helper import Helper
-from computations.utils.Phase import Phase
-from computations.utils.TimeSeriesMerger import TimeSeriesMerger
 from computations.Constants import Constants
 from computations.Diamonds import Diamonds
 from computations.Wheel import Wheel
+from computations.utils.Helper import Helper
+from computations.utils.Phase import Phase
+from computations.utils.TimeSeriesMerger import TimeSeriesMerger
 from utils.Exceptions import *
 from utils.Logging import *
 
@@ -58,7 +58,8 @@ class PredictorPhysics(object):
         if ts_list is None:
             raise CriticalException('Cache is not initialized. Call load_cache().')
 
-        inverse_ts_list, inverse_ts_mean = PredictorPhysics.compute_inverse_for_games(ts_list)
+        # inverse_ts_list, inverse_ts_mean = PredictorPhysics.compute_inverse_for_games(ts_list)
+        ts_mean = np.nanmean(TimeSeriesMerger.merge(ts_list), axis=0)
 
         last_time_ball_passes_in_front_of_ref = ball_recorded_times[-1]
         last_wheel_lap_time_in_front_of_ref = Helper.get_last_time_wheel_is_in_front_of_ref(wheel_recorded_times,
@@ -70,31 +71,32 @@ class PredictorPhysics(object):
 
         # can probably match with the lap times. We de-couple the hyper parameters.
         # maybe inverse is less sensitive to error measurements.
-        inverse_lap_times = np.apply_along_axis(func1d=Helper.get_inverse, axis=0, arr=ball_lap_times)
+        # inverse_lap_times = np.apply_along_axis(func1d=Helper.get_inverse, axis=0, arr=ball_lap_times)
 
         # check all indices
-        index_of_rev_start = Helper.find_abs_start_index(inverse_lap_times, inverse_ts_mean)
-        index_of_last_recorded_time = ball_loop_count + index_of_rev_start - 1
+        index_of_rev_start = Helper.find_abs_start_index(ball_lap_times, ts_mean)
+        index_of_last_recorded_time = ball_loop_count + index_of_rev_start
 
-        matched_game_indices = TimeSeriesMerger.find_nearest_neighbors(inverse_lap_times,
-                                                                       inverse_ts_list,
+        matched_game_indices = TimeSeriesMerger.find_nearest_neighbors(ball_lap_times,
+                                                                       ts_list,
                                                                        index_of_last_recorded_time,
                                                                        neighbors_count=Constants.NEAREST_NEIGHBORS_COUNT)
-
-        estimated_time_left = np.mean(np.sum(ts_list[matched_game_indices, (index_of_last_recorded_time + 1):], axis=1))
+        # average across all the neighbors residuals
+        estimated_time_left = np.mean(np.sum(ts_list[matched_game_indices, index_of_last_recorded_time:], axis=1))
 
         # TODO: very simple way to calculate it. Might be more complex.
-        decreasing_factor = np.mean(np.array((inverse_ts_list[matched_game_indices] / np.hstack(
-            [inverse_ts_list[matched_game_indices, 1:2] * 0 + 1, inverse_ts_list[matched_game_indices, :-1]]))[:, 1:]))
+        increasing_factor = np.mean(ts_list[matched_game_indices, 1:] / ts_list[matched_game_indices, :-1])
 
         # if we have [0, 0, 1, 2, 3, 0, 0], index_of_rev_start = 2, index_current_abs = 2 + 3 - 1 = 4
-        qty_1 = inverse_ts_list[matched_game_indices, (index_of_last_recorded_time + 1):].shape[1] - 1
-        qty_2 = (np.mean(
-            inverse_ts_list[matched_game_indices, -1] / inverse_ts_list[matched_game_indices, -2])) / decreasing_factor
-        number_of_revolutions_left_ball = qty_1 + qty_2
+        # because the last loop is not complete so -1 (due to new convention).
+        rem_loops = ts_list[matched_game_indices, index_of_last_recorded_time:].shape[1] - 1
+        # check if * or /
+        rem_res_loop = np.mean(
+            ts_list[matched_game_indices, -1] / ts_list[matched_game_indices, -2]) / increasing_factor
+        number_of_revolutions_left_ball = rem_loops + rem_res_loop
 
         if number_of_revolutions_left_ball <= 0:
-            error_msg = 'qty_1 = {}, qty_2 = {}.'.format(qty_1, qty_2)
+            error_msg = 'rem_loops = {}, rem_res_loop = {}.'.format(rem_loops, rem_res_loop)
             raise PositiveValueExpectedException('number_of_revolutions_left_ball should be positive. ' + error_msg)
 
         log('number_of_revolutions_left_ball = {}'.format(number_of_revolutions_left_ball))
@@ -122,6 +124,8 @@ class PredictorPhysics(object):
                                                                        wheel_last_revolution_time,
                                                                        Constants.DEFAULT_WHEEL_WAY)
 
+        # check how it is computed in details. Can't make up my mind now.
+        # maybe  (1 - (estimated_time_left / wheel_last_revolution_time) % 1) * len(Wheel.NUMBERS)
         shift_between_initial_time_and_cutoff = ((estimated_time_left / wheel_last_revolution_time) % 1) * len(
             Wheel.NUMBERS)
 

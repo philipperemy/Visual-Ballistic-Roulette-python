@@ -1,6 +1,6 @@
 import numpy as np
 
-from Exceptions import *
+from utils.Exceptions import *
 
 
 class Wheel(object):
@@ -19,7 +19,6 @@ class Wheel(object):
         ANTICLOCKWISE = 'ANTICLOCKWISE'
 
     # * Calculate a valid index from Z -> [0, 36] (length = 37 numbers)
-    # 	 * 
     # 	 * @param any integer
     # 	 * @return valid index
     @staticmethod

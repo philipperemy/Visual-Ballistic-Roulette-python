@@ -1,8 +1,8 @@
 import numpy as np
 
-from Helper import Helper
-from Phase import Phase
-from TimeSeriesMerger import TimeSeriesMerger
+from computations.utils.Helper import Helper
+from computations.utils.Phase import Phase
+from computations.utils.TimeSeriesMerger import TimeSeriesMerger
 from computations.Constants import Constants
 from computations.Diamonds import Diamonds
 from computations.Wheel import Wheel

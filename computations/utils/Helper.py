@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn import linear_model
 
-from TimeSeriesMerger import TimeSeriesMerger as tsm
+from computations.utils.TimeSeriesMerger import TimeSeriesMerger as tsm
 
 
 class Helper(object):
@@ -23,7 +23,7 @@ class Helper(object):
 
     @staticmethod
     def get_inverse(x):
-        return 1 / x
+        return 1.0 / x
 
     # Example is list of size 160, L=80. We expect two lists of size 80.
     @staticmethod

@@ -1,4 +1,4 @@
-from Wheel import Wheel
+from computations.Wheel import Wheel
 
 
 class Constants(object):

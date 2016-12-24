@@ -1,6 +1,6 @@
 import numpy as np
 
-from Constants import *
+from computations.Constants import *
 
 
 class Diamonds(object):

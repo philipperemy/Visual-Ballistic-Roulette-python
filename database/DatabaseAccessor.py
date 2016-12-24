@@ -1,6 +1,6 @@
 import sqlite3
 
-from Constants import *
+from computations.Constants import *
 from utils.Logging import *
 
 

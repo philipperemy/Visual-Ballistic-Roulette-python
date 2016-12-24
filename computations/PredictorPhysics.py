@@ -79,7 +79,7 @@ class PredictorPhysics(object):
 
         matched_game_indices = TimeSeriesMerger.find_nearest_neighbors(ball_lap_times,
                                                                        ts_list,
-                                                                       index_of_last_recorded_time,
+                                                                       index_of_rev_start,
                                                                        neighbors_count=Constants.NEAREST_NEIGHBORS_COUNT)
         # average across all the neighbors residuals
         estimated_time_left = np.mean(np.sum(ts_list[matched_game_indices, index_of_last_recorded_time:], axis=1))
@@ -119,24 +119,23 @@ class PredictorPhysics(object):
             raise PositiveValueExpectedException()
 
         wheel_last_revolution_time = wheel_lap_times[-1]
-        initial_phase = Phase.find_phase_number_between_ball_and_wheel(last_time_ball_passes_in_front_of_ref,
-                                                                       last_wheel_lap_time_in_front_of_ref,
-                                                                       wheel_last_revolution_time,
-                                                                       Constants.DEFAULT_WHEEL_WAY)
+        initial_number = Phase.find_phase_number_between_ball_and_wheel(last_time_ball_passes_in_front_of_ref,
+                                                                        last_wheel_lap_time_in_front_of_ref,
+                                                                        wheel_last_revolution_time,
+                                                                        Constants.DEFAULT_WHEEL_WAY)
 
         # check how it is computed in details. Can't make up my mind now.
-        # maybe  (1 - (estimated_time_left / wheel_last_revolution_time) % 1) * len(Wheel.NUMBERS)
         shift_between_initial_time_and_cutoff = ((estimated_time_left / wheel_last_revolution_time) % 1) * len(
             Wheel.NUMBERS)
 
         shift_to_add = shift_ball_cutoff + shift_between_initial_time_and_cutoff
-        predicted_number_cutoff = Wheel.get_number_with_shift(initial_phase, shift_to_add, Constants.DEFAULT_WHEEL_WAY)
+        predicted_number_cutoff = Wheel.get_number_with_shift(initial_number, shift_to_add, Constants.DEFAULT_WHEEL_WAY)
         log("shift_between_initial_time_and_cutoff = {}".format(shift_between_initial_time_and_cutoff), debug)
         log("predicted_number_cutoff is = {}".format(predicted_number_cutoff), debug)
 
         log("expected_bouncing_shift = {}".format(expected_bouncing_shift), debug)
         shift_to_add += expected_bouncing_shift
-        predicted_number = Wheel.get_number_with_shift(initial_phase, shift_to_add, Constants.DEFAULT_WHEEL_WAY)
+        predicted_number = Wheel.get_number_with_shift(initial_number, shift_to_add, Constants.DEFAULT_WHEEL_WAY)
         log("predicted_number is = {}".format(predicted_number), debug)
 
         # possibility to assess the error on:
@@ -154,7 +153,7 @@ class PredictorPhysics(object):
         # - number_of_revolutions_left_ball (NOTHING) BALL SPEED IS NOT NEEDED.
         # - PHASE 2 - if both quantities are correct, we can estimate predicted_number_cutoff exactly (without any
         # errors on the measurements).
-        # - initial_phase (NOTHING) WHEEL SPEED IS NOT NEEDED.
+        # - initial_number (NOTHING) WHEEL SPEED IS NOT NEEDED.
         # - predicted_number_cutoff
         # - predicted_number (less important)
         # - diamond: FORWARD, BLOCKER, NO_DIAMOND (position of the diamond)

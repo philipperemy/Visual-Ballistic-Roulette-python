@@ -1,15 +1,13 @@
 import numpy as np
 from sklearn import linear_model
 
-from TimeSeriesMerger import *
-from computations.Constants import *
+from TimeSeriesMerger import TimeSeriesMerger as tsm
 
 
 class Helper(object):
-
     @staticmethod
     def convert_to_seconds(milliseconds):
-        return np.array([1e-3 * x for x in milliseconds])
+        return 1e-3 * np.array(milliseconds)
 
     @staticmethod
     def get_last_time_wheel_is_in_front_of_ref(wheel_lap_times, ball_lap_time_in_front_of_ref):
@@ -42,5 +40,5 @@ class Helper(object):
 
     @staticmethod
     def find_abs_start_index(times, mean_times):
-        new_times, index_of_rev_start_abs = TimeSeriesMerger.find_index(times, mean_times)
+        new_times, index_of_rev_start_abs = tsm.find_index(times, mean_times)
         return index_of_rev_start_abs

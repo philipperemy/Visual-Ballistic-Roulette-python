@@ -1,4 +1,6 @@
-from Helper import *
+import numpy as np
+
+from computations.Wheel import Wheel
 
 
 class Phase(object):

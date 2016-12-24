@@ -1,8 +1,14 @@
-from Phase import *
-from TimeSeriesMerger import *
+import numpy as np
+
+from Helper import Helper
+from Phase import Phase
+from TimeSeriesMerger import TimeSeriesMerger
+from computations.Constants import Constants
+from computations.Diamonds import Diamonds
+from computations.Wheel import Wheel
 from utils.Exceptions import *
 from utils.Logging import *
-from Diamonds import *
+
 
 class PredictorPhysics(object):
     LAP_TIMES_ALL_GAMES = None

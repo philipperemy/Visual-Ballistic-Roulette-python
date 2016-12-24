@@ -25,5 +25,5 @@ class Diamonds(object):
         # 5 is a big value to be sure to be inside the bounds of diamond_types[]
         diamond_types = [Diamonds.DiamondType.FORWARD, Diamonds.DiamondType.BLOCKER] * 5
         distance_from_diamonds = np.array(diamond_angles - res_distance_left) ** 2
-        index = np.argmin(distance_from_diamonds) + Constants.MOVE_TO_NEXT_DIAMOND
+        index = np.argmin(distance_from_diamonds) + Constants.BIAS_MOVE_TO_NEXT_DIAMOND
         return diamond_types[index]

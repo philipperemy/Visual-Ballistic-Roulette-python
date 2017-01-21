@@ -11,7 +11,7 @@ class TimeSeriesMerger(object):
         """
         Merge time series from the end up to the beginning.
         The method is optimal and independent of the measurement errors.
-        :param list_of_time_series: time series to match together.
+        :param list_of_time_series: time series to aggregate together.
         :return: aggregation of all the time series.
         """
         N = TimeSeriesMerger.max_len(list_of_time_series)

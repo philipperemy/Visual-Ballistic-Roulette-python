@@ -1,6 +1,6 @@
 import unittest
 
-from computations.utils.Helper import *
+from computations.comp_utils.Helper import *
 
 
 class TestRegression(unittest.TestCase):

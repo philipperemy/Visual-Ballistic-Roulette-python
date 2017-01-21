@@ -3,9 +3,9 @@ import numpy as np
 from computations.Constants import Constants
 from computations.Diamonds import Diamonds
 from computations.Wheel import Wheel
-from computations.utils.Helper import Helper
-from computations.utils.Phase import Phase
-from computations.utils.TimeSeriesMerger import TimeSeriesMerger
+from computations.comp_utils.Helper import Helper
+from computations.comp_utils.Phase import Phase
+from computations.comp_utils.TimeSeriesMerger import TimeSeriesMerger
 from utils.Exceptions import *
 from utils.Logging import *
 

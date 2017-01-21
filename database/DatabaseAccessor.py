@@ -24,7 +24,7 @@ class DatabaseAccessor(object):
         self.exec_query(
             'CREATE TABLE IF NOT EXISTS `clockwise` (`ID` INTEGER PRIMARY KEY AUTOINCREMENT, `CLOCKWISE` int(11) NOT NULL, `SESSION_ID` int(11) NOT NULL)')
         self.exec_query(
-            'CREATE TABLE IF NOT EXISTS `outcomes` (`ID` INTEGER PRIMARY KEY AUTOINCREMENT, `SESSION_ID` int(10) NOT NULL, `NUMBER` varchar(255) NOT NULL, `OBSTACLES` int(10) NOT NULL)')
+            'CREATE TABLE IF NOT EXISTS `outcomes` (`ID` INTEGER PRIMARY KEY AUTOINCREMENT, `SESSION_ID` int(10) NOT NULL, `NUMBER` varchar(255) NOT NULL, `DETERMINISTIC_NUMBER` varchar(255))')
         self.exec_query(
             'CREATE TABLE IF NOT EXISTS `wheel_lap_times` (`ID` INTEGER PRIMARY KEY AUTOINCREMENT, `SESSION_ID` int(10) NOT NULL, `TIME` varchar(255) NOT NULL)')
 
@@ -47,6 +47,11 @@ class DatabaseAccessor(object):
 
     def get_outcome(self, session_id):
         query = "SELECT NUMBER FROM `outcomes` WHERE SESSION_ID = " + str(session_id) + ";"
+        for row in self.connect.execute(query):
+            return int(row[0])
+
+    def get_deterministic_outcome(self, session_id):
+        query = "SELECT DETERMINISTIC_NUMBER FROM `outcomes` WHERE SESSION_ID = " + str(session_id) + ";"
         for row in self.connect.execute(query):
             return int(row[0])
 
@@ -76,9 +81,10 @@ class DatabaseAccessor(object):
     def close(self):
         self.connect.close()
 
-    def insert_outcome(self, session_id, number):
-        query = "INSERT INTO `outcomes` (`ID`, `SESSION_ID`, `NUMBER`, `OBSTACLES`) VALUES (NULL, '" + str(session_id) \
-                + "', '" + str(number) + "', 0);"
+    def insert_outcome(self, session_id, number, deterministic_number):
+        query = "INSERT INTO `outcomes` (`ID`, `SESSION_ID`, `NUMBER`, `DETERMINISTIC_NUMBER`) VALUES (NULL, '" + str(
+            session_id) \
+                + "', '" + str(number) + "', '" + str(deterministic_number) + "');"
         self.exec_query(query)
 
     def exec_query(self, sql_query):
@@ -91,4 +97,6 @@ if __name__ == '__main__':
     tst.increment_and_get_session_id()
     tst.insert_ball_lap_times(1, 123)
     tst.insert_wheel_lap_times(1, 124)
-    tst.insert_outcome(1, 32)
+    tst.insert_outcome(1, 32, 26)
+    print(tst.get_outcome(1))
+    print(tst.get_deterministic_outcome(1))

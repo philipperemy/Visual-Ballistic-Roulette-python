@@ -1,6 +1,6 @@
 import unittest
 
-from computations.utils.TimeSeriesMerger import *
+from computations.comp_utils.TimeSeriesMerger import *
 
 
 class TestTimeSeriesMerger(unittest.TestCase):

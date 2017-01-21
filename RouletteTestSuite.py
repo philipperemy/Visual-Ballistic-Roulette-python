@@ -6,8 +6,8 @@ def add_all_folders_to_python_path():
     sys.path.append("./database")
     sys.path.append("./computations")
     sys.path.append("./computations/predictor")
-    sys.path.append("./computations/utils")
-    sys.path.append("./utils")
+    sys.path.append("./computations/comp_utils")
+    sys.path.append("./comp_utils")
 
 
 add_all_folders_to_python_path()

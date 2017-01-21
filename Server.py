@@ -10,8 +10,8 @@ from flask_restful import Resource, Api, reqparse
 def add_all_folders_to_python_path():
     sys.path.append("./database")
     sys.path.append("./computations")
-    sys.path.append("./computations/utils")
-    sys.path.append("./utils")
+    sys.path.append("./computations/comp_utils")
+    sys.path.append("./comp_utils")
 
 
 add_all_folders_to_python_path()
@@ -19,7 +19,7 @@ add_all_folders_to_python_path()
 from database.DatabaseAccessor import *
 from database.SessionManager import *
 from PredictorPhysics import *
-from computations.utils.Helper import *
+from computations.comp_utils.Helper import *
 from utils.Logging import *
 
 

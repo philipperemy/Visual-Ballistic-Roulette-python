@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn import linear_model
 
-from computations.utils.TimeSeriesMerger import TimeSeriesMerger as tsm
+from computations.comp_utils.TimeSeriesMerger import TimeSeriesMerger as tsm
 
 
 class Helper(object):

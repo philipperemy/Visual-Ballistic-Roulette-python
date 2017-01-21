@@ -2,8 +2,9 @@ from Wheel import Wheel
 
 
 class Measure(object):
-    expected = None
-    actual = None
+    def __init__(self, expected, actual):
+        self.expected = expected
+        self.actual = actual
 
 
 # The algorithm can be split into two parts:

@@ -4,16 +4,13 @@ from computations.Wheel import Wheel
 
 
 class Phase(object):
-    #
     # 	We want to find the number of the wheel where the ball passes in front of the mark.
-    #
     # 	@param time_of_ball_in_front_of_mark last time in seconds when the balls passes in front of the mark.
     # 	@param time_of_wheel_in_front_of_mark last time in seconds when the zero of the wheel is in front of the mark.
     # 	@param wheel_revolution_time last known revolution time of the wheel.
     # 	@param way always ANTICLOCKWISE (despite the fact the clockwise way was implemented)
     # 	@return the number that is aligned with the mark when the ball was in front of the mark at time
     #  time_of_ball_in_front_of_landmark.
-    #
     @staticmethod
     def find_phase_number_between_ball_and_wheel(time_of_ball_in_front_of_mark,
                                                  time_of_wheel_in_front_of_mark,
@@ -32,7 +29,7 @@ class Phase(object):
             elif way == Wheel.WheelWay.ANTICLOCKWISE:
                 idx = idx_zero + idx_phase
             else:
-                raise Exception("Unknown type.")
+                raise Exception('Unknown type.')
         else:
             #  t(Wheel) > t(Ball) Ball is ahead of phase
             #  The question is what is the value of the ball when the wheel
@@ -42,5 +39,5 @@ class Phase(object):
             elif way == Wheel.WheelWay.ANTICLOCKWISE:
                 idx = idx_zero - idx_phase
             else:
-                raise Exception("Unknown type.")
+                raise Exception('Unknown type.')
         return Wheel.NUMBERS[Wheel.get_index(idx)]

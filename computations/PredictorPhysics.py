@@ -17,7 +17,7 @@ class PredictorPhysics(object):
     def compute_inverse_for_games(ts_list):
         bs_list = []
         for ball_lap_times in ts_list:
-            bs_list.append(np.apply_along_axis(func1d=Helper.get_inverse, axis=0, arr=ball_lap_times))
+            bs_list.append(1.0 / np.array(ball_lap_times))
         mean_inverse_per_revolution = np.nanmean(TimeSeriesMerger.merge(bs_list), axis=0)
         return np.array(bs_list), mean_inverse_per_revolution
 
@@ -25,12 +25,13 @@ class PredictorPhysics(object):
     def load_cache(database):
         """
         New convention is that the last ball lap times measure is done when the ball enters the diamonds ring.
+        TODO: get RID of this convention.
         """
         lap_times_all_games = list()
         for session_id in database.get_session_ids():
             ball_recorded_times = database.select_ball_recorded_times(session_id)
             if len(ball_recorded_times) >= Constants.MIN_BALL_COUNT_OF_RECORDED_TIMES:
-                ball_lap_times = Helper.compute_diff(Helper.convert_to_seconds(ball_recorded_times))
+                ball_lap_times = np.diff(Helper.convert_to_seconds(ball_recorded_times))
                 lap_times_all_games.append(ball_lap_times)
         PredictorPhysics.LAP_TIMES_ALL_GAMES = np.array(lap_times_all_games)
 
@@ -65,8 +66,8 @@ class PredictorPhysics(object):
         last_wheel_lap_time_in_front_of_ref = Helper.get_last_time_wheel_is_in_front_of_ref(wheel_recorded_times,
                                                                                             last_time_ball_passes_in_front_of_ref)
         log('reference time of prediction = {} s'.format(last_time_ball_passes_in_front_of_ref), debug)
-        ball_lap_times = Helper.compute_diff(ball_recorded_times)
-        wheel_lap_times = Helper.compute_diff(wheel_recorded_times)
+        ball_lap_times = np.diff(ball_recorded_times)
+        wheel_lap_times = np.diff(wheel_recorded_times)
         ball_loop_count = len(ball_lap_times)
 
         # can probably match with the lap times. We de-couple the hyper parameters.

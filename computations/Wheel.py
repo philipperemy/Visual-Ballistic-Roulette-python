@@ -4,9 +4,9 @@ from utils.Exceptions import *
 
 
 class Wheel(object):
-    # 	 * Roulette numbers represented as a 1D-vector. Each number is accessed with
-    # 	 * its index. Arithmetic operations are made on the indexes. For example.
-    # 	 * Index of 0 is 0. Index of 32 is 1. Distance(0,32) = 1 - 0 = 1
+    # Roulette numbers represented as a 1D-vector. Each number is accessed with
+    # its index. Arithmetic operations are made on the indexes. For example.
+    # Index of 0 is 0. Index of 32 is 1. Distance(0,32) = 1 - 0 = 1
     # 	 
     NUMBERS = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9,
                22, 18, 29, 7, 28, 12, 35, 3, 26]
@@ -18,9 +18,9 @@ class Wheel(object):
         CLOCKWISE = 'CLOCKWISE'
         ANTICLOCKWISE = 'ANTICLOCKWISE'
 
-    # * Calculate a valid index from Z -> [0, 36] (length = 37 numbers)
-    # 	 * @param any integer
-    # 	 * @return valid index
+    # Calculate a valid index from Z -> [0, 36] (length = 37 numbers)
+    # param any integer
+    # return valid index
     @staticmethod
     def get_index(index):
         return index % len(Wheel.NUMBERS)

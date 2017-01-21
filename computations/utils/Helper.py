@@ -17,14 +17,6 @@ class Helper(object):
                 res = wheel_time_in_front_of_ref
         return res
 
-    @staticmethod
-    def compute_diff(lap_times):
-        return np.diff(np.array(lap_times))
-
-    @staticmethod
-    def get_inverse(x):
-        return 1.0 / x
-
     # Example is list of size 160, L=80. We expect two lists of size 80.
     @staticmethod
     def split(list_, l):

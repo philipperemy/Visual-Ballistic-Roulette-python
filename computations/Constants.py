@@ -9,9 +9,6 @@ class Constants(object):
     BIAS_MOVE_TO_NEXT_DIAMOND = 0  # due to the intrinsic speed. might change something. to be removed maybe later.
 
     class Type:
-        def __init__(self):
-            pass
-
         BALL = 'BALL'
         WHEEL = 'WHEEL'
 

@@ -3,10 +3,10 @@ from computations.Wheel import Wheel
 
 class Constants(object):
     # Hyper parameters.
-    EXPECTED_BOUNCING_SHIFT_FORWARD_DIAMOND = 16
+    EXPECTED_BOUNCING_SHIFT_FORWARD_DIAMOND = 12
     EXPECTED_BOUNCING_SHIFT_BLOCKER_DIAMOND = 6
     NEAREST_NEIGHBORS_COUNT = 1
-    BIAS_MOVE_TO_NEXT_DIAMOND = 0  # due to the intrinsic speed. might change something. to be removed maybe later.
+    BIAS_MOVE_TO_NEXT_DIAMOND = 1  # due to the intrinsic speed. might change something. to be removed maybe later.
 
     class Type:
         BALL = 'BALL'

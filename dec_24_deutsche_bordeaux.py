@@ -15,11 +15,12 @@ if __name__ == '__main__':
 
     for predicted in predictions:
         new_session_id = da.increment_and_get_session_id()
+        print(new_session_id)
         assert_equals(str(new_session_id), predicted['video_id'])
-        for bs in predicted['ball_lap_times']:
-            da.insert_ball_lap_times(new_session_id, float(bs) * 1000)
-        for ws in predicted['wheel_lap_times']:
-            da.insert_ball_lap_times(new_session_id, float(ws) * 1000)
+        for bs in np.array(predicted['ball_lap_times']) * 1000:
+            da.insert_ball_lap_times(new_session_id, float(bs))
+        for ws in np.array(predicted['wheel_lap_times']) * 1000:
+            da.insert_wheel_lap_times(new_session_id, float(ws))
 
     da.insert_outcome(1, 29, 15)
     da.insert_outcome(2, 2, 24)

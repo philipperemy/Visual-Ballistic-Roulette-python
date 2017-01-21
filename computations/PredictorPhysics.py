@@ -33,7 +33,7 @@ class PredictorPhysics(object):
 
     @staticmethod
     def predict_most_probable_number(ball_recorded_times, wheel_recorded_times, debug=False):
-
+        # TODO: output the deterministic number.
         if len(wheel_recorded_times) < Constants.MIN_WHEEL_COUNT_OF_RECORDED_TIMES:
             raise SessionNotReadyException('Session not ready. Too few wheel recorded times.')
 

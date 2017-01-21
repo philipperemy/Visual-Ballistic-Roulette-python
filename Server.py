@@ -19,7 +19,6 @@ add_all_folders_to_python_path()
 from database.DatabaseAccessor import *
 from database.SessionManager import *
 from PredictorPhysics import *
-from computations.comp_utils.Helper import *
 from utils.Logging import *
 
 

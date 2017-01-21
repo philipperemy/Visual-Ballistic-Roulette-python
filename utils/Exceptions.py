@@ -1,10 +1,13 @@
 class CriticalException(Exception):
-    pass
+    def __str__(self):
+        return 'CriticalException'
 
 
 class PositiveValueExpectedException(Exception):
-    pass
+    def __str__(self):
+        return 'PositiveValueExpectedException'
 
 
 class SessionNotReadyException(Exception):
-    pass
+    def __str__(self):
+        return 'SessionNotReadyException'

@@ -5,9 +5,6 @@ from computations.Constants import *
 
 class Diamonds(object):
     class DiamondType:
-        def __init__(self):
-            pass
-
         BLOCKER = 'BLOCKER'
         FORWARD = 'FORWARD'
         NONE = 'NONE'

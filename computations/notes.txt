@@ -1,0 +1,27 @@
+# possibility to assess the error on:
+# - PHASE 1
+# - number_of_revolutions_left_ball
+# - estimated_time_left
+# - PHASE 2 - if both quantities are correct, we can estimate predicted_number_cutoff exactly (without any
+# errors on the measurements).
+# - predicted_number_cutoff
+# - predicted_number (less important)
+# - diamond: FORWARD, BLOCKER, NO_DIAMOND (position of the diamond)
+
+# HYPER PARAMETER RELATION WITH QUANTITIES
+# - estimated_time_left (NOTHING) BALL SPEED IS NOT NEEDED.
+# - number_of_revolutions_left_ball (NOTHING) BALL SPEED IS NOT NEEDED.
+# - PHASE 2 - if both quantities are correct, we can estimate predicted_number_cutoff exactly (without any
+# errors on the measurements).
+# - initial_number (NOTHING) WHEEL SPEED IS NOT NEEDED.
+# - predicted_number_cutoff
+# - predicted_number (less important)
+# - diamond: FORWARD, BLOCKER, NO_DIAMOND (position of the diamond)
+
+#     # constants to optimise.
+#   EXPECTED_BOUNCING_SHIFT_FORWARD_DIAMOND = 16
+#   EXPECTED_BOUNCING_SHIFT_BLOCKER_DIAMOND = 6
+#   MOVE_TO_NEXT_DIAMOND = 0  # due to the intrinsic speed. might change something. to be removed maybe later.
+#
+# Important
+# Actually we don't need BALL_SPEED, WHEEL_SPEED, CUTOFF_SPEED !

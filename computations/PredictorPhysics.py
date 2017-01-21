@@ -133,7 +133,7 @@ class PredictorPhysics(object):
         # at the cutoff time, i.e. estimated_time_left seconds later.
         # shift_ball_cutoff - the ball is also moving during this time. Let's not focus on the wheel. Where is the ball
         # compared to the wheel at the cutoff time. We imagine that the wheel is fixed.
-        # We then add the two quantities (superposition principle) to know about the real shift.
+        # We then add the two quantities (composition principle) to know about the real shift.
         shift_to_add = shift_ball_cutoff + shift_between_initial_time_and_cutoff
         predicted_number_cutoff = Wheel.get_number_with_shift(initial_number, shift_to_add, Constants.DEFAULT_WHEEL_WAY)
         log("shift_between_initial_time_and_cutoff = {0:.2f}".format(shift_between_initial_time_and_cutoff), debug)
@@ -145,31 +145,4 @@ class PredictorPhysics(object):
         predicted_number = Wheel.get_number_with_shift(initial_number, shift_to_add, Constants.DEFAULT_WHEEL_WAY)
         log("predicted_number is = {}".format(predicted_number), debug)
 
-        # possibility to assess the error on:
-        # - PHASE 1
-        # - number_of_revolutions_left_ball
-        # - estimated_time_left
-        # - PHASE 2 - if both quantities are correct, we can estimate predicted_number_cutoff exactly (without any
-        # errors on the measurements).
-        # - predicted_number_cutoff
-        # - predicted_number (less important)
-        # - diamond: FORWARD, BLOCKER, NO_DIAMOND (position of the diamond)
-
-        # HYPER PARAMETER RELATION WITH QUANTITIES
-        # - estimated_time_left (NOTHING) BALL SPEED IS NOT NEEDED.
-        # - number_of_revolutions_left_ball (NOTHING) BALL SPEED IS NOT NEEDED.
-        # - PHASE 2 - if both quantities are correct, we can estimate predicted_number_cutoff exactly (without any
-        # errors on the measurements).
-        # - initial_number (NOTHING) WHEEL SPEED IS NOT NEEDED.
-        # - predicted_number_cutoff
-        # - predicted_number (less important)
-        # - diamond: FORWARD, BLOCKER, NO_DIAMOND (position of the diamond)
-
-        #     # constants to optimise.
-        #   EXPECTED_BOUNCING_SHIFT_FORWARD_DIAMOND = 16
-        #   EXPECTED_BOUNCING_SHIFT_BLOCKER_DIAMOND = 6
-        #   MOVE_TO_NEXT_DIAMOND = 0  # due to the intrinsic speed. might change something. to be removed maybe later.
-        #
-        # Important
-        # Actually we don't need BALL_SPEED, WHEEL_SPEED, CUTOFF_SPEED !
         return predicted_number

@@ -87,16 +87,21 @@ if __name__ == '__main__':
     deterministic_predicted_numbers = []
     for predicted in predictions:
         session_id = predicted['video_id']
-        BS = da.select_ball_recorded_times(session_id)
-        WS = da.select_wheel_recorded_times(session_id)
+        BS = np.array(da.select_ball_recorded_times(session_id))
+        WS = np.array(da.select_wheel_recorded_times(session_id))
         try:
             for depth in range(1, 8):
-                det_number, number = PredictorPhysics.predict_most_probable_number(BS[:-depth], WS, debug=True)
+                new_BS = BS[:-depth]
+                new_WS = WS[WS < max(new_BS)]  # must be measurable.
+                det_number, number = PredictorPhysics.predict_most_probable_number(new_BS, new_WS, debug=True)
+                det_error = AngularMeasure(det_number, da.get_deterministic_outcome(session_id)).error()
+                print('ses_id = {}, det_error = {}, depth = {}'.format(session_id, det_error, depth))
                 expected_numbers.append(da.get_outcome(session_id))
                 predicted_numbers.append(number)
                 deterministic_expected_numbers.append(da.get_deterministic_outcome(session_id))
                 deterministic_predicted_numbers.append(det_number)
         except:
+            print('ses_id = {}, FAILURE'.format(session_id))
             failures += 1.0
 
     final_errors = []

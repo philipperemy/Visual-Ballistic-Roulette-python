@@ -23,6 +23,8 @@ class PredictorPhysics(object):
 
     @staticmethod
     def load_cache(database):
+        # TODO: bug. we should not add the last value at the diamond to compare the games here.
+        # at least not when we compare the values for the mean to find abs_rev_start
         lap_times_all_games_list = list()
         for session_id in database.get_session_ids():
             ball_recorded_times = database.select_ball_recorded_times(session_id)
@@ -71,12 +73,14 @@ class PredictorPhysics(object):
         # maybe inverse is less sensitive to error measurements.
         # check all indices
         index_of_rev_start = Helper.find_abs_start_index(ball_lap_times, ts_mean)
+        log('index_of_rev_start = {}'.format(index_of_rev_start), debug)
         index_of_last_recorded_time = ball_loop_count + index_of_rev_start
 
         matched_game_indices = TimeSeriesMerger.find_nearest_neighbors(ball_lap_times,
                                                                        ts_list,
                                                                        index_of_rev_start,
                                                                        neighbors_count=Constants.NEAREST_NEIGHBORS_COUNT)
+        log('matched_game_indices = {}'.format(matched_game_indices))
         # average across all the neighbors residuals
         estimated_time_left = np.mean(np.sum(ts_list[matched_game_indices, index_of_last_recorded_time:], axis=1))
         log('estimated_time_left = {0:.2f}s'.format(estimated_time_left))

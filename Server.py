@@ -110,7 +110,7 @@ class ResponseRoulette(Resource):
             outcome = args[Parameters.OUTCOME]
             if outcome is not None and outcome != '':
                 # Insert number workflow
-                da.insert_outcome(session_id, outcome)
+                da.insert_outcome(session_id, 0, outcome)
                 log('New outcome inserted. Session id = {}, outcome = {}'.format(session_id, outcome))
                 return {'status': 'success',
                         'outcome': outcome,

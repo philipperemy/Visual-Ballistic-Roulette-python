@@ -81,8 +81,8 @@ class DatabaseAccessor(object):
     def close(self):
         self.connect.close()
 
-    def insert_outcome(self, session_id, number, deterministic_number):
-        log("session_id = {}, number = {}, deterministic_number = {}".format(session_id, number, deterministic_number))
+    def insert_outcome(self, session_id, deterministic_number, number):
+        log("session_id = {}, deterministic_number = {}, number = {}".format(session_id, deterministic_number, number))
         query = "INSERT INTO `outcomes` (`ID`, `SESSION_ID`, `NUMBER`, `DETERMINISTIC_NUMBER`) VALUES (NULL, '" + str(
             session_id) \
                 + "', '" + str(number) + "', '" + str(deterministic_number) + "');"

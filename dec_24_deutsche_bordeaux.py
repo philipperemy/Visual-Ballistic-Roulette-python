@@ -86,14 +86,15 @@ if __name__ == '__main__':
     deterministic_expected_numbers = []
     deterministic_predicted_numbers = []
     for predicted in predictions:
-        BS = np.array(predicted['ball_lap_times']) * 1000
-        WS = np.array(predicted['wheel_lap_times']) * 1000
+        session_id = predicted['video_id']
+        BS = da.select_ball_recorded_times(session_id)
+        WS = da.select_wheel_recorded_times(session_id)
         try:
             for depth in range(1, 8):
                 det_number, number = PredictorPhysics.predict_most_probable_number(BS[:-depth], WS, debug=True)
-                expected_numbers.append(da.get_outcome(predicted['video_id']))
+                expected_numbers.append(da.get_outcome(session_id))
                 predicted_numbers.append(number)
-                deterministic_expected_numbers.append(da.get_deterministic_outcome(predicted['video_id']))
+                deterministic_expected_numbers.append(da.get_deterministic_outcome(session_id))
                 deterministic_predicted_numbers.append(det_number)
         except:
             failures += 1.0

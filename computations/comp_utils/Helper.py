@@ -1,3 +1,5 @@
+import re
+
 import numpy as np
 from sklearn import linear_model
 
@@ -34,3 +36,15 @@ class Helper(object):
     def find_abs_start_index(times, mean_times):
         new_times, index_of_rev_start_abs = tsm.find_index(times, mean_times)
         return index_of_rev_start_abs
+
+    @staticmethod
+    def natural_keys(text):
+        """
+        alist.sort(key=natural_keys) sorts in human order
+        http://nedbatchelder.com/blog/200712/human_sorting.html
+        (See Toothy's implementation in the comments)
+        """
+        def atoi(t):
+            return int(t) if t.isdigit() else t
+
+        return [atoi(c) for c in re.split('(\d+)', text)]

@@ -3,13 +3,13 @@ from glob import glob
 
 import numpy as np
 
-from natural_sort import natural_keys
+from comp_utils.Helper import *
 
 
 def read_experimentation_results():
     output = []
     results = glob('../Visual-Ballistic-Roulette-Vision/output/**/videos/results/*.txt')
-    results.sort(key=natural_keys)
+    results.sort(key=Helper.natural_keys)
     for result in results:
         with open(result, 'r') as r:
             lines = r.readlines()

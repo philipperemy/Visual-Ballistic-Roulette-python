@@ -119,8 +119,8 @@ class ResponseRoulette(Resource):
             # Predict number workflow.
             ball_recorded_times = da.select_ball_recorded_times(session_id)
             wheel_recorded_times = da.select_wheel_recorded_times(session_id)
-            predicted_number = PredictorPhysics.predict_most_probable_number(ball_recorded_times,
-                                                                             wheel_recorded_times)
+            _, predicted_number = PredictorPhysics.predict_most_probable_number(ball_recorded_times,
+                                                                                wheel_recorded_times)
             log('Predicted number = {}, session id = {}'.format(predicted_number, session_id))
             return {'status': 'success',
                     'predicted_number': predicted_number,

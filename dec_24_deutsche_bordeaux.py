@@ -83,21 +83,29 @@ if __name__ == '__main__':
     failures = 0.0
     expected_numbers = []
     predicted_numbers = []
+    deterministic_expected_numbers = []
+    deterministic_predicted_numbers = []
     for predicted in predictions:
         BS = np.array(predicted['ball_lap_times']) * 1000
         WS = np.array(predicted['wheel_lap_times']) * 1000
         try:
             for depth in range(1, 8):
-                number = PredictorPhysics.predict_most_probable_number(BS[:-depth], WS, debug=True)
+                det_number, number = PredictorPhysics.predict_most_probable_number(BS[:-depth], WS, debug=True)
                 expected_numbers.append(da.get_outcome(predicted['video_id']))
                 predicted_numbers.append(number)
+                deterministic_expected_numbers.append(da.get_deterministic_outcome(predicted['video_id']))
+                deterministic_predicted_numbers.append(det_number)
         except:
             failures += 1.0
 
-    errors = []
+    final_errors = []
     for (e, p) in zip(expected_numbers, predicted_numbers):
-        errors.append(AngularMeasure(e, p).error())
+        final_errors.append(AngularMeasure(e, p).error())
 
-    print('errors =', errors)
-    print('errors mean =', np.mean(errors))
+    det_errors = []
+    for (e, p) in zip(deterministic_expected_numbers, deterministic_predicted_numbers):
+        det_errors.append(AngularMeasure(e, p).error())
+
+    print('mean =', np.mean(final_errors), 'final_errors =', final_errors)
+    print('mean =', np.mean(det_errors), 'det_errors =', det_errors)
     print('total failures = {}'.format(float(failures) / len(predictions)))

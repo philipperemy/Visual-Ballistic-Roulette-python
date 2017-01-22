@@ -33,7 +33,7 @@ class PredictorPhysics(object):
 
     @staticmethod
     def predict_most_probable_number(ball_recorded_times, wheel_recorded_times, debug=False):
-        # TODO: output the deterministic number.
+
         if len(wheel_recorded_times) < Constants.MIN_WHEEL_COUNT_OF_RECORDED_TIMES:
             raise SessionNotReadyException('Session not ready. Too few wheel recorded times.')
 
@@ -43,10 +43,10 @@ class PredictorPhysics(object):
         ball_recorded_times = Helper.convert_to_seconds(ball_recorded_times)
         wheel_recorded_times = Helper.convert_to_seconds(wheel_recorded_times)
 
-        most_probable_number = PredictorPhysics.predict(ball_recorded_times,
-                                                        wheel_recorded_times,
-                                                        debug)
-        return most_probable_number
+        most_probable_number_cutoff, most_probable_number = PredictorPhysics.predict(ball_recorded_times,
+                                                                                     wheel_recorded_times,
+                                                                                     debug)
+        return most_probable_number_cutoff, most_probable_number
 
     @staticmethod
     def predict(ball_recorded_times, wheel_recorded_times, debug):
@@ -133,7 +133,7 @@ class PredictorPhysics(object):
         # at the cutoff time, i.e. estimated_time_left seconds later.
         # shift_ball_cutoff - the ball is also moving during this time. Let's not focus on the wheel. Where is the ball
         # compared to the wheel at the cutoff time. We imagine that the wheel is fixed.
-        # We then add the two quantities (composition principle) to know about the real shift.
+        # We then add the two quantities (composition of the kinetics) to know about the real shift.
         shift_to_add = shift_ball_cutoff + shift_between_initial_time_and_cutoff
         predicted_number_cutoff = Wheel.get_number_with_shift(initial_number, shift_to_add, Constants.DEFAULT_WHEEL_WAY)
         log("shift_between_initial_time_and_cutoff = {0:.2f}".format(shift_between_initial_time_and_cutoff), debug)
@@ -145,4 +145,4 @@ class PredictorPhysics(object):
         predicted_number = Wheel.get_number_with_shift(initial_number, shift_to_add, Constants.DEFAULT_WHEEL_WAY)
         log("predicted_number is = {}".format(predicted_number), debug)
 
-        return predicted_number
+        return predicted_number_cutoff, predicted_number

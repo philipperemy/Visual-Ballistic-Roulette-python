@@ -18,7 +18,7 @@ class TimeSeriesMerger(object):
         pad_time_series = []
         for time_series in list_of_time_series:
             pad_time_series.append((N - len(time_series)) * [np.nan] + list(time_series))
-        return pad_time_series
+        return np.array(pad_time_series)
 
     @staticmethod
     def compute_loss(time_series, list_of_time_series):
@@ -69,7 +69,9 @@ class TimeSeriesMerger(object):
 
     @staticmethod
     def find_nearest_neighbors(time_series1, list_of_time_series, index_of_start, neighbors_count):
-        losses = np.square(time_series1 - list_of_time_series[:, index_of_start:index_of_start + len(time_series1)])
+        a = list_of_time_series[:, index_of_start:index_of_start + len(time_series1)]
+        b = a[~np.isnan(a).any(axis=1)]
+        losses = np.square(time_series1 - b)
         losses = np.sum(losses, axis=1)
         matched_game_indices = np.argsort(losses)[:neighbors_count]
         return matched_game_indices

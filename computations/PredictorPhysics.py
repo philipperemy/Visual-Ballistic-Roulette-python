@@ -11,7 +11,8 @@ from utils.Logging import *
 
 
 class PredictorPhysics(object):
-    LAP_TIMES_ALL_GAMES_LIST = None
+    LAP_TIMES_ALL_GAMES_LIST = None  # contains all the lap times for the known games
+    DIAMOND_RING_ALL_GAMES_LIST = None  # contains all the times between the last landmark 0 and the diamond rings
 
     @staticmethod
     def compute_inverse_for_games(ts_list):
@@ -23,15 +24,17 @@ class PredictorPhysics(object):
 
     @staticmethod
     def load_cache(database):
-        # TODO: bug. we should not add the last value at the diamond to compare the games here.
         # at least not when we compare the values for the mean to find abs_rev_start
         lap_times_all_games_list = list()
+        diamond_ring_all_games_list = list()
         for session_id in database.get_session_ids():
             ball_recorded_times = database.select_ball_recorded_times(session_id)
             if len(ball_recorded_times) >= Constants.MIN_BALL_COUNT_OF_RECORDED_TIMES:
                 ball_lap_times = np.diff(Helper.convert_to_seconds(ball_recorded_times))
-                lap_times_all_games_list.append(ball_lap_times)
+                lap_times_all_games_list.append(ball_lap_times[:-1])
+                diamond_ring_all_games_list.append(ball_lap_times[-1])
         PredictorPhysics.LAP_TIMES_ALL_GAMES_LIST = lap_times_all_games_list
+        PredictorPhysics.DIAMOND_RING_ALL_GAMES_LIST = diamond_ring_all_games_list
 
     @staticmethod
     def predict_most_probable_number(ball_recorded_times, wheel_recorded_times, debug=False):
@@ -51,19 +54,20 @@ class PredictorPhysics(object):
         return most_probable_number_cutoff, most_probable_number
 
     @staticmethod
-    def predict(ball_recorded_times, wheel_recorded_times, debug):
+    def predict(ball_recorded_times, wheel_recorded_times, debug=True):
         # Last measurement is when the ball hits the diamond ring.
-        ts_list = PredictorPhysics.LAP_TIMES_ALL_GAMES_LIST
+        ts_list = np.array(PredictorPhysics.LAP_TIMES_ALL_GAMES_LIST.copy())
+        dr_list = np.array(PredictorPhysics.DIAMOND_RING_ALL_GAMES_LIST.copy())
 
-        if ts_list is None:
+        if ts_list is None or dr_list is None:
             raise CriticalException('Cache is not initialized. Call load_cache().')
 
-        ts_list = np.nan_to_num(TimeSeriesMerger.merge(ts_list))
-        ts_mean = np.mean(ts_list, axis=0)
+        ts_list = TimeSeriesMerger.merge(ts_list)
+        ts_mean = np.nanmean(ts_list, axis=0)
 
         last_time_ball_passes_in_front_of_ref = ball_recorded_times[-1]
-        last_wheel_lap_time_in_front_of_ref = Helper.get_last_time_wheel_is_in_front_of_ref(wheel_recorded_times,
-                                                                                            last_time_ball_passes_in_front_of_ref)
+        last_wheel_lap_time_in_front_of_ref = Helper.get_last_time_wheel_is_in_front_of_ref(
+            wheel_recorded_times, last_time_ball_passes_in_front_of_ref)
         log('ref time of the prediction = {0:.2f}s'.format(last_time_ball_passes_in_front_of_ref), debug)
         ball_lap_times = np.diff(ball_recorded_times)
         wheel_lap_times = np.diff(wheel_recorded_times)
@@ -80,36 +84,33 @@ class PredictorPhysics(object):
                                                                        ts_list,
                                                                        index_of_rev_start,
                                                                        neighbors_count=Constants.NEAREST_NEIGHBORS_COUNT)
-        log('matched_game_indices = {}'.format(matched_game_indices))
+        log('matched_game_indices = {}'.format(matched_game_indices), debug)
         # average across all the neighbors residuals
         estimated_time_left = np.mean(np.sum(ts_list[matched_game_indices, index_of_last_recorded_time:], axis=1))
-        log('estimated_time_left = {0:.2f}s'.format(estimated_time_left))
+        estimated_time_left += np.mean(np.sum(dr_list[matched_game_indices], axis=0))
+        log('estimated_time_left = {0:.2f}s'.format(estimated_time_left), debug)
 
         if estimated_time_left <= 0:
             raise PositiveValueExpectedException('estimated_time_left must be positive.')
 
-        # very simple way to calculate it. Could be more complex.
-        # we don't take the last one because the last rotation is not complete (convention is: tick when
-        # ball hits the diamond ring)
-        increasing_factor = np.mean(ts_list[matched_game_indices, -2] / ts_list[matched_game_indices, -3])
+        max_residual_time = (len(dr_list) + 1) / len(dr_list) * np.max(dr_list)  # unbiased estimator.
 
         # if we have [0, 0, 1, 2, 3, 0, 0], index_of_rev_start = 2, index_current_abs = 2 + 3 - 1 = 4
         # because the last loop is not complete so -1 (due to new convention).
-        rem_loops = ts_list[matched_game_indices, index_of_last_recorded_time:].shape[1] - 1
+        rem_loops = ts_list[matched_game_indices, index_of_last_recorded_time:].shape[1]
         # check if * or /
-        rem_res_loop = np.mean(
-            ts_list[matched_game_indices, -1] / (ts_list[matched_game_indices, -2] * increasing_factor))
+        rem_res_loop = np.mean(dr_list[matched_game_indices] / max_residual_time)
         number_of_revolutions_left_ball = rem_loops + rem_res_loop
 
         if number_of_revolutions_left_ball <= 0:
             error_msg = 'rem_loops = {0:.2f}, rem_res_loop = {0:.2f}.'.format(rem_loops, rem_res_loop)
             raise PositiveValueExpectedException('number_of_revolutions_left_ball must be positive.' + error_msg)
 
-        log('number_of_revolutions_left_ball = {0:.2f}'.format(number_of_revolutions_left_ball))
+        log('number_of_revolutions_left_ball = {0:.2f}'.format(number_of_revolutions_left_ball), debug)
 
         # the time values are always taken at the same diamond.
         diamond = Diamonds.detect_diamonds(number_of_revolutions_left_ball)
-        log('diamond to be hit = {}'.format(diamond))
+        log('diamond to be hit = {}'.format(diamond), debug)
 
         if diamond == Diamonds.DiamondType.BLOCKER:
             expected_bouncing_shift = Constants.EXPECTED_BOUNCING_SHIFT_BLOCKER_DIAMOND
@@ -140,13 +141,11 @@ class PredictorPhysics(object):
         # We then add the two quantities (composition of the kinetics) to know about the real shift.
         shift_to_add = shift_ball_cutoff + shift_between_initial_time_and_cutoff
         predicted_number_cutoff = Wheel.get_number_with_shift(initial_number, shift_to_add, Constants.DEFAULT_WHEEL_WAY)
-        log("shift_between_initial_time_and_cutoff = {0:.2f}".format(shift_between_initial_time_and_cutoff), debug)
-        log("shift_ball_cutoff = {0:.2f}".format(shift_ball_cutoff), debug)
-        log("predicted_number_cutoff = {}".format(predicted_number_cutoff), debug)
-
-        log("expected_bouncing_shift = {}".format(expected_bouncing_shift), debug)
+        log('shift_between_initial_time_and_cutoff = {0:.2f}'.format(shift_between_initial_time_and_cutoff), debug)
+        log('shift_ball_cutoff = {0:.2f}'.format(shift_ball_cutoff), debug)
+        log('predicted_number_cutoff = {}'.format(predicted_number_cutoff), debug)
+        log('expected_bouncing_shift = {}'.format(expected_bouncing_shift), debug)
         shift_to_add += expected_bouncing_shift
         predicted_number = Wheel.get_number_with_shift(initial_number, shift_to_add, Constants.DEFAULT_WHEEL_WAY)
-        log("predicted_number is = {}".format(predicted_number), debug)
-
+        log('predicted_number is = {}'.format(predicted_number), debug)
         return predicted_number_cutoff, predicted_number

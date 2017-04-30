@@ -82,7 +82,7 @@ def get_real_number(ball_recorded_time, last_wheel_recorded_time, wheel_last_rev
 
 
 def get_number(t, initial_number, rev_time):
-    res_t = t % rev_time
+    res_t = (t % rev_time) / rev_time
     shift_to_add = res_t * len(Wheel.NUMBERS)
     return Wheel.get_number_with_shift(initial_number, shift_to_add, Wheel.WheelWay.CLOCKWISE)
 
@@ -153,7 +153,9 @@ def next_batch(debug=True):
         if abs_wheel_time is None:
             numbers.append(None)
         else:
-            numbers.append(get_real_number(abs_ball_time, abs_wheel_time, rev_time))
+            num = get_real_number(abs_ball_time, abs_wheel_time, rev_time)
+            assert num == get_number(abs_ball_time - abs_wheel_time, 0, rev_time)
+            numbers.append(num)
     number_cutoff = numbers[-1]
     numbers = np.array(numbers)
     # ball_lap_times = np.diff(abs_ball_times)

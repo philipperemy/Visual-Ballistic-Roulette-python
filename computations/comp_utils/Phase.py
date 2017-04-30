@@ -18,7 +18,7 @@ class Phase(object):
                                                  way):
         diff_time = np.abs(time_of_ball_in_front_of_mark - time_of_wheel_in_front_of_mark)
         numbers_count = len(Wheel.NUMBERS)
-        idx_phase = int((diff_time / wheel_revolution_time * numbers_count))
+        idx_phase = int(np.round((diff_time / wheel_revolution_time * numbers_count)))
         idx_zero = Wheel.find_index_of_number(0)  # Should be always 0
         if time_of_ball_in_front_of_mark > time_of_wheel_in_front_of_mark:
             #  t(Wheel) < t(Ball) Wheel is ahead of phase

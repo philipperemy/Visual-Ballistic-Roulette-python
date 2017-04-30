@@ -93,13 +93,16 @@ class PredictorPhysics(object):
         if estimated_time_left <= 0:
             raise PositiveValueExpectedException('estimated_time_left must be positive.')
 
-        max_residual_time = (len(dr_list) + 1) / len(dr_list) * np.max(dr_list)  # unbiased estimator.
+        # unbiased estimator. it should work here.
+        max_residual_time = np.max(dr_list[matched_game_indices])
+        # max_residual_time = 4.5
 
         # if we have [0, 0, 1, 2, 3, 0, 0], index_of_rev_start = 2, index_current_abs = 2 + 3 - 1 = 4
         # because the last loop is not complete so -1 (due to new convention).
         rem_loops = ts_list[matched_game_indices, index_of_last_recorded_time:].shape[1]
         # check if * or /
-        rem_res_loop = np.mean(dr_list[matched_game_indices] / max_residual_time)
+        rem_res_loop = np.mean(dr_list[matched_game_indices] / max_residual_time)  # we should calibrate it more.
+        # this phase is probably the least accurate.
         number_of_revolutions_left_ball = rem_loops + rem_res_loop
 
         if number_of_revolutions_left_ball <= 0:
@@ -149,3 +152,9 @@ class PredictorPhysics(object):
         predicted_number = Wheel.get_number_with_shift(initial_number, shift_to_add, Constants.DEFAULT_WHEEL_WAY)
         log('predicted_number is = {}'.format(predicted_number), debug)
         return predicted_number_cutoff, predicted_number
+
+        # Equal to predicted_number_cutoff
+        # Phase.find_phase_number_between_ball_and_wheel(time_at_cutoff_ball,
+        #                                        last_wheel_lap_time_in_front_of_ref,
+        #                                        wheel_last_revolution_time,
+        #                                        Constants.DEFAULT_WHEEL_WAY)

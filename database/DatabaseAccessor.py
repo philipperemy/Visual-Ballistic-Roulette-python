@@ -35,7 +35,7 @@ class DatabaseAccessor(object):
         self.insert(self.WHEEL_LAP_TIMES_TABLE_NAME, session_id, lap_time)
 
     def insert(self, table_name, session_id, lap_time):
-        log("table_name = {}, session_id = {}, lap_time = {}".format(table_name, session_id, lap_time))
+        # log("table_name = {}, session_id = {}, lap_time = {}".format(table_name, session_id, lap_time))
         query = "INSERT INTO `" + table_name + "` (`ID`, `SESSION_ID`, `TIME`) VALUES (NULL, '" + \
                 str(session_id) + "', '" + str(lap_time) + "');"
         self.exec_query(query)

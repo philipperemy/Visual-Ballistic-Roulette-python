@@ -3,6 +3,48 @@ from computations.comp_utils.Measures import *
 from database.DatabaseAccessor import *
 from read_results import read_experimentation_results, assert_equals
 
+
+def run(bounce_blocker, bounce_forward):
+    Constants.EXPECTED_BOUNCING_SHIFT_BLOCKER_DIAMOND = bounce_blocker
+    Constants.EXPECTED_BOUNCING_SHIFT_FORWARD_DIAMOND = bounce_forward
+    failures = 0.0
+    expected_numbers = []
+    predicted_numbers = []
+    deterministic_expected_numbers = []
+    deterministic_predicted_numbers = []
+    for predicted in predictions:
+        session_id = predicted['video_id']
+        BS = np.array(da.select_ball_recorded_times(session_id))
+        WS = np.array(da.select_wheel_recorded_times(session_id))
+        try:
+            for depth in range(1, 2):
+                new_BS = BS[:-depth]
+                new_WS = WS[WS < max(new_BS)]  # must be measurable.
+                det_number, number = PredictorPhysics.predict_most_probable_number(new_BS, new_WS, debug=False)
+                det_error = AngularMeasure(det_number, da.get_deterministic_outcome(session_id)).error()
+                # print('ses_id = {}, det_error = {}, depth = {}'.format(session_id, det_error, depth))
+                expected_numbers.append(da.get_outcome(session_id))
+                predicted_numbers.append(number)
+                deterministic_expected_numbers.append(da.get_deterministic_outcome(session_id))
+                deterministic_predicted_numbers.append(det_number)
+        except:
+            print('ses_id = {}, FAILURE'.format(session_id))
+            failures += 1.0
+
+    final_errors = []
+    for (e, p) in zip(expected_numbers, predicted_numbers):
+        final_errors.append(AngularMeasure(e, p).error())
+
+    det_errors = []
+    for (e, p) in zip(deterministic_expected_numbers, deterministic_predicted_numbers):
+        det_errors.append(AngularMeasure(e, p).error())
+
+    print('mean =', np.mean(final_errors), 'final_errors =', final_errors)
+    print('mean =', np.mean(det_errors), 'det_errors =', det_errors)
+    print('total failures = {}'.format(float(failures) / len(predictions)))
+    return np.mean(final_errors)
+
+
 if __name__ == '__main__':
     try:
         os.remove('roulette-experiment.db')
@@ -80,38 +122,11 @@ if __name__ == '__main__':
     da.insert_outcome(27, 0, 34)
 
     PredictorPhysics.load_cache(da)
-    failures = 0.0
-    expected_numbers = []
-    predicted_numbers = []
-    deterministic_expected_numbers = []
-    deterministic_predicted_numbers = []
-    for predicted in predictions:
-        session_id = predicted['video_id']
-        BS = np.array(da.select_ball_recorded_times(session_id))
-        WS = np.array(da.select_wheel_recorded_times(session_id))
-        try:
-            for depth in range(1, 8):
-                new_BS = BS[:-depth]
-                new_WS = WS[WS < max(new_BS)]  # must be measurable.
-                det_number, number = PredictorPhysics.predict_most_probable_number(new_BS, new_WS, debug=True)
-                det_error = AngularMeasure(det_number, da.get_deterministic_outcome(session_id)).error()
-                print('ses_id = {}, det_error = {}, depth = {}'.format(session_id, det_error, depth))
-                expected_numbers.append(da.get_outcome(session_id))
-                predicted_numbers.append(number)
-                deterministic_expected_numbers.append(da.get_deterministic_outcome(session_id))
-                deterministic_predicted_numbers.append(det_number)
-        except:
-            print('ses_id = {}, FAILURE'.format(session_id))
-            failures += 1.0
 
-    final_errors = []
-    for (e, p) in zip(expected_numbers, predicted_numbers):
-        final_errors.append(AngularMeasure(e, p).error())
-
-    det_errors = []
-    for (e, p) in zip(deterministic_expected_numbers, deterministic_predicted_numbers):
-        det_errors.append(AngularMeasure(e, p).error())
-
-    print('mean =', np.mean(final_errors), 'final_errors =', final_errors)
-    print('mean =', np.mean(det_errors), 'det_errors =', det_errors)
-    print('total failures = {}'.format(float(failures) / len(predictions)))
+    run(22, 30)
+    # err = []
+    # for i in range(37):
+    #    for j in range(37):
+    #        err.append((i, j, run(i, j)))
+    #        print(i, j)
+    # print(err)

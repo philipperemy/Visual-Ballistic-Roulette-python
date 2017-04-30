@@ -87,7 +87,7 @@ class PredictorPhysics(object):
         log('matched_game_indices = {}'.format(matched_game_indices), debug)
         # average across all the neighbors residuals
         estimated_time_left = np.mean(np.sum(ts_list[matched_game_indices, index_of_last_recorded_time:], axis=1))
-        estimated_time_left += np.mean(np.sum(dr_list[matched_game_indices], axis=0))
+        estimated_time_left += np.mean(dr_list[matched_game_indices], axis=0)
         log('estimated_time_left = {0:.2f}s'.format(estimated_time_left), debug)
 
         if estimated_time_left <= 0:

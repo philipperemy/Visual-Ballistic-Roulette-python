@@ -5,7 +5,7 @@ class Constants(object):
     # Hyper parameters.
     EXPECTED_BOUNCING_SHIFT_FORWARD_DIAMOND = 22
     EXPECTED_BOUNCING_SHIFT_BLOCKER_DIAMOND = 30
-    NEAREST_NEIGHBORS_COUNT = 1
+    NEAREST_NEIGHBORS_COUNT = 5
     BIAS_MOVE_TO_NEXT_DIAMOND = 0  # due to the intrinsic speed. might change something. to be removed maybe later.
 
     class Type:

@@ -73,9 +73,6 @@ class PredictorPhysics(object):
         wheel_lap_times = np.diff(wheel_recorded_times)
         ball_loop_count = len(ball_lap_times)
 
-        # can probably match with the lap times. We de-couple the hyper parameters.
-        # maybe inverse is less sensitive to error measurements.
-        # check all indices
         index_of_rev_start = Helper.find_abs_start_index(ball_lap_times, ts_mean)
         log('index_of_rev_start = {}'.format(index_of_rev_start), debug)
         index_of_last_recorded_time = ball_loop_count + index_of_rev_start
@@ -85,7 +82,7 @@ class PredictorPhysics(object):
                                                                        index_of_rev_start,
                                                                        neighbors_count=Constants.NEAREST_NEIGHBORS_COUNT)
         log('matched_game_indices = {}'.format(matched_game_indices), debug)
-        # average across all the neighbors residuals
+
         estimated_time_left = np.mean(np.sum(ts_list[matched_game_indices, index_of_last_recorded_time:], axis=1))
         estimated_time_left += np.mean(dr_list[matched_game_indices], axis=0)
         log('estimated_time_left = {0:.2f}s'.format(estimated_time_left), debug)
@@ -93,16 +90,14 @@ class PredictorPhysics(object):
         if estimated_time_left <= 0:
             raise PositiveValueExpectedException('estimated_time_left must be positive.')
 
-        # unbiased estimator. it should work here.
+        # biased estimator but still it should work here.
         max_residual_time = np.max(dr_list[matched_game_indices])
-        # max_residual_time = 4.5
 
-        # if we have [0, 0, 1, 2, 3, 0, 0], index_of_rev_start = 2, index_current_abs = 2 + 3 - 1 = 4
-        # because the last loop is not complete so -1 (due to new convention).
+        # if we have [0, 0, 1, 2, 3, 0, 0], index_of_rev_start = 2
+        # rem_loops is actually useless to compute :)
         rem_loops = ts_list[matched_game_indices, index_of_last_recorded_time:].shape[1]
-        # check if * or /
+
         rem_res_loop = np.mean(dr_list[matched_game_indices] / max_residual_time)  # we should calibrate it more.
-        # this phase is probably the least accurate.
         number_of_revolutions_left_ball = rem_loops + rem_res_loop
 
         if number_of_revolutions_left_ball <= 0:

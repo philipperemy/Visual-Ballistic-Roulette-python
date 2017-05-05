@@ -4,7 +4,7 @@ from computations.PredictorPhysics import *
 from computations.comp_utils.Measures import AngularMeasure
 from database.DatabaseAccessor import *
 # from simulations.data_generation_8_b_w_fake_do_not_use_easier_problem import next_batch
-from simulations.data_generation_9_b_w import next_batch
+from simulations.data_generation_10_b_w import next_batch
 
 # error 2 with the real values. should be 0.
 # the generator is not the best though.
@@ -17,7 +17,7 @@ def main():
     except FileNotFoundError:
         pass
     da = DatabaseAccessor.get_instance()
-    n = 2000
+    n = 10000
     average_error = deque(maxlen=50)
     for i in range(n):
         nb = next_batch(debug=debug)

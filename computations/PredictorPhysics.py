@@ -91,7 +91,7 @@ class PredictorPhysics(object):
             raise PositiveValueExpectedException('estimated_time_left must be positive.')
 
         # biased estimator but still it should work here.
-        max_residual_time = np.max(dr_list[matched_game_indices])
+        max_residual_time = np.max(dr_list)
 
         # if we have [0, 0, 1, 2, 3, 0, 0], index_of_rev_start = 2
         # rem_loops is actually useless to compute :)
@@ -99,6 +99,11 @@ class PredictorPhysics(object):
 
         rem_res_loop = np.mean(dr_list[matched_game_indices] / max_residual_time)  # we should calibrate it more.
         number_of_revolutions_left_ball = rem_loops + rem_res_loop
+
+        # TODO: for later.
+        # we need to have a better approximation of:
+        # We can maybe fit an ARIMA on the Abs Ball times
+        # or get rem_res_loop accurate.
 
         if number_of_revolutions_left_ball <= 0:
             error_msg = 'rem_loops = {0:.2f}, rem_res_loop = {0:.2f}.'.format(rem_loops, rem_res_loop)

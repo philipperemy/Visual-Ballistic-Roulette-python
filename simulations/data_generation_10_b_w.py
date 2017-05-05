@@ -61,17 +61,17 @@ def generate_abs_times(circumference, cutoff_speed, init_max_time_value_first_ba
     cur_time = np.random.uniform(low=0.0, high=init_max_time_value_first_ball_time)
     abs_times = [cur_time]
     abs_cutoff_time = neg_exp_inv(cutoff_speed)
-    for j in range(10):
+    while True:
         try:
             cur_time = find_upper_bound_for_given_integral_value(neg_exp_F_inv, neg_exp_F, circumference, cur_time)
         except Exception:
             cur_time = np.nan
-        # print(cur_time)
         if np.isnan(cur_time) or cur_time >= abs_cutoff_time:
+            print('ground truth next abs time = {}'.format(cur_time))
             break
         abs_times.append(cur_time)
     warnings.filterwarnings('ignore')
-    return np.array(abs_times), 17  # TODO: remove it.
+    return np.array(abs_times), abs_cutoff_time
 
 
 def get_real_number(ball_recorded_time, last_wheel_recorded_time, wheel_last_revolution_time):
@@ -93,8 +93,8 @@ def test_wheel():
     np.testing.assert_almost_equal(get_number(rev_time, initial_number, rev_time), initial_number)
     np.testing.assert_almost_equal(get_number(2 * rev_time, initial_number, rev_time), initial_number)
     np.testing.assert_almost_equal(get_number(0, initial_number, rev_time), initial_number)
-    np.testing.assert_almost_equal(get_number(rev_time / 2, 0, rev_time), [10])
-    np.testing.assert_almost_equal(get_number(rev_time / 2, 10, rev_time), [26])
+    np.testing.assert_almost_equal(get_number(rev_time / 2, 0, rev_time), [5])
+    np.testing.assert_almost_equal(get_number(rev_time / 2, 10, rev_time), [0])
     np.testing.assert_almost_equal(get_number(.001, 0, rev_time), [0])
     # at time 0, this is the initial number.
     # at time 3, should be again 0.
@@ -158,28 +158,30 @@ def next_batch(debug=True):
             numbers.append(num)
     number_landmark_number_cutoff = numbers[-1]
     ball_distance_travelled = distance_travelled(abs_ball_times[-1], abs_cutoff_time, neg_exp)
-    ball_cutoff_shift = (ball_distance_travelled % circ) / circ * len(Wheel.NUMBERS)
+    distance_percentage = (ball_distance_travelled % circ) / circ
+    ball_cutoff_shift = distance_percentage * len(Wheel.NUMBERS)
     number_cutoff = Wheel.get_number_with_shift(number_landmark_number_cutoff, ball_cutoff_shift,
                                                 Wheel.WheelWay.CLOCKWISE)
 
     numbers = np.array(numbers)[:-1]
-    # ball_lap_times = np.diff(abs_ball_times)
-    # wheel_lap_times = np.diff(abs_wheel_times)
-    # cutoff_lap_time = abs_cutoff_time - abs_ball_times[-1]
-    # number_cutoff = get_number(abs_cutoff_time, initial_number, rev_time)
     if debug:
         print('-' * 80)
-        print('ABSOLUTE BALL TIMES    =', abs_ball_times)
-        print('ABSOLUTE WHEEL TIMES   =', abs_wheel_times)
-        print('ABS CUTOFF TIME        =', abs_cutoff_time)
-        print('NUMBERS                =', numbers)
-        print('NUMBER CUTOFF          =', number_cutoff)
-    # plot_a(ball_diff_times)
-    # sleep(0.1)
+        print('ABSOLUTE BALL TIMES       =', abs_ball_times)
+        print('ABSOLUTE WHEEL TIMES      =', abs_wheel_times)
+        print('ABS CUTOFF TIME           =', abs_cutoff_time)
+        print('NUMBERS                   =', numbers)
+        print('BALL CUTOFF SHIFT         =', ball_cutoff_shift)
+        print('NUMBER CUTOFF             =', number_cutoff)
+        print('DISTANCE PERC             =', distance_percentage)
+        print('NUMBER LANDMARK AT CUTOFF =', number_landmark_number_cutoff)
+
     return {'abs_ball_times': abs_ball_times,
             'abs_wheel_times': abs_wheel_times,
             'abs_cutoff_time': abs_cutoff_time,
-            'numbers': np.array(numbers),
+            'numbers': numbers,
+            'number_landmark_number_cutoff': number_landmark_number_cutoff,
+            'ball_cutoff_shift': ball_cutoff_shift,
+            'distance_percentage': distance_percentage,
             'number_cutoff': number_cutoff}
 
 

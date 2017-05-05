@@ -2,7 +2,7 @@ from computations.PredictorPhysics import *
 from computations.comp_utils.Measures import AngularMeasure
 from database.DatabaseAccessor import *
 # from simulations.data_generation_8_b_w_fake_do_not_use_easier_problem import next_batch
-from simulations.data_generation_9_b_w import next_batch
+from simulations.data_generation_10_b_w import next_batch
 
 
 def test():
